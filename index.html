@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favours Surprises - Surprise Your loved one's!</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for social media logos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Glowing Pink Color Palette & Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        
+        :root {
+            --pink-base: #ff69b4; /* Hot Pink */
+            --pink-light: #ffc0cb; /* Light Pink */
+            --pink-glow: #ff4081; /* Neon Pink for glow */
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Tailwind Configuration */
+        .glowing-shadow {
+            box-shadow: 0 0 15px var(--pink-glow), 0 0 5px var(--pink-base) inset;
+        }
+
+        .glowing-text {
+            text-shadow: 0 0 8px var(--pink-glow);
+        }
+
+        .glowing-bg {
+            background-color: var(--pink-base);
+            box-shadow: 0 0 20px var(--pink-glow);
+        }
+        
+        /* Custom CSS for Animations (Hidden by default) */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        /* Class added by JS to trigger the animation */
+        .fade-in-up.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Full Screen Slider Styling */
+        .full-screen-slider-track {
+            display: flex;
+            overflow-x: scroll;
+            scroll-snap-type: x mandatory; /* Snap to images */
+            -webkit-overflow-scrolling: touch;
+            width: 100vw; /* Take full viewport width */
+            margin-left: calc(50% - 50vw); /* Center the full-width block */
+            height: 70vh;
+        }
+
+        .full-screen-slide-item {
+            flex: 0 0 95vw; /* Each slide takes 95% of viewport width */
+            height: 70vh; /* Fixed height for visual consistency */
+            scroll-snap-align: center;
+            object-fit: cover;
+            margin-right: 5vw; /* Gap between images to show the next one */
+            transition: transform 0.5s ease;
+        }
+        
+        /* Custom style for the fixed contact button */
+        #whatsapp-fixed-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+        
+        #whatsapp-fixed-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Bike Man Delivery Animation */
+        @keyframes ride {
+            0% { transform: translateX(-100vw); }
+            100% { transform: translateX(200vw); } /* Move across and off screen */
+        }
+
+        #bike-man {
+            position: fixed;
+            bottom: 50px; /* Near the bottom */
+            z-index: 10;
+            font-size: 3rem;
+            animation: ride 30s linear infinite; /* Slow, constant speed */
+        }
+
+        /* Drag Item Styling */
+        .drag-item {
+            cursor: grab;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        
+        /* Drop Zone Active State */
+        .drop-zone-active {
+            border-color: var(--pink-glow) !important;
+            box-shadow: 0 0 30px var(--pink-glow) !important;
+        }
+        
+        /* Visualization Item Animation for drop-in effect */
+        .viz-item {
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Springy transition */
+            transform: scale(0);
+        }
+        
+        .viz-item.active {
+            transform: scale(1);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'favour-pink': 'var(--pink-base)',
+                        'favour-glow': 'var(--pink-glow)',
+                        'favour-light': 'var(--pink-light)',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen">
+
+    <!-- BIKE MAN DELIVERY ANIMATION (Hidden on small screens) -->
+    <div id="bike-man" class="hidden md:block">
+        <span role="img" aria-label="Delivery rider on a scooter with a gift box" class="text-favour-pink glowing-text">🛵📦💖</span>
+    </div>
+
+    <!-- 1. INTRO MODAL - Love Message -->
+    <div id="intro-modal" class="fixed inset-0 z-[100] bg-white bg-opacity-95 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-favour-light p-8 md:p-12 rounded-3xl glowing-shadow max-w-lg text-center transform scale-90 md:scale-100 transition duration-500 ease-out">
+            <h2 class="text-3xl md:text-5xl glowing-text text-favour-pink mb-4 font-extrabold">A Message For You...</h2>
+            <p class="text-xl md:text-2xl text-gray-800 mb-6">
+                "Every great love story deserves its perfect chapter. Let us help you write yours with a surprise they'll cherish forever."
+            </p>
+            <button onclick="closeModal()" class="px-8 py-3 bg-favour-pink text-white text-lg font-semibold rounded-full hover:bg-favour-glow transition duration-300 glowing-shadow">
+                Enter The World of Surprises
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. FIXED WHATSAPP BUTTON -->
+    <a id="whatsapp-fixed-btn" href="https://wa.me/2349134158314?text=I'm%20ready%20to%20plan%20a%20surprise!" target="_blank" aria-label="Chat on WhatsApp" class="p-4 rounded-full glowing-bg text-white hover:glowing-shadow transition duration-300">
+        <i data-lucide="message-square-text" class="w-8 h-8"></i>
+    </a>
+
+    <!-- 3. HEADER -->
+    <header class="p-6 sticky top-0 bg-white z-20 shadow-lg glowing-shadow shadow-favour-light">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold glowing-text text-favour-pink uppercase tracking-widest">
+                Favours Surprises
+            </h1>
+            <nav>
+                <!-- Hidden on mobile, simple links -->
+                <a href="#services" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Services</a>
+                <a href="#configurator" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Build</a>
+                <a href="#gallery-section" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Gallery</a>
+                <a href="#contact" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+
+        <!-- 4. HERO SECTION -->
+        <section class="py-16 md:py-24 text-center fade-in-up" id="hero">
+            <h2 class="text-5xl md:text-8xl font-black text-favour-pink glowing-text mb-6 leading-tight">
+                Surprise Your <span class="text-favour-glow italic">loved one</span> Today.
+            </h2>
+            <p class="text-xl md:text-3xl text-gray-700 max-w-3xl mx-auto">
+                We specialize in crafting custom, unforgettable gifts and experiences that scream L-O-V-E! Choose your perfect combination of romance.
+            </p>
+            <a href="#services" class="mt-8 inline-block px-10 py-4 glowing-bg text-white text-xl font-bold rounded-full hover:scale-105 transition duration-300 transform">
+                Start Planning Your Surprise
+            </a>
+        </section>
+
+        <!-- 5. SERVICES SECTION -->
+        <section class="py-16 fade-in-up" id="services">
+            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
+                Our Romantic Offerings
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <!-- Service Card 1 -->
+                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
+                    <i data-lucide="gift" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
+                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Custom Gifts</h4>
+                    <p class="text-gray-700">Gifts chosen by you to match their personality. Perfectly wrapped in love.</p>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
+                    <i data-lucide="party-popper" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
+                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Balloons & Decor</h4>
+                    <p class="text-gray-700">Beautiful, vibrant arrangements to set the scene for the perfect moment.</p>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
+                    <i data-lucide="teddy-bear" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
+                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Plush Teddy Bears</h4>
+                    <p class="text-gray-700">Cuddly companions that deliver your love when you can't be there.</p>
+                </div>
+
+                <!-- Service Card 4 -->
+                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
+                    <i data-lucide="candy" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
+                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Candy & Treats</h4>
+                    <p class="text-gray-700">Sweeten the surprise with delicious candy and treats. A whole lot more!</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 6. BUILD YOUR SURPRISE CONFIGURATOR (Drag & Drop) -->
+        <section class="py-16 fade-in-up" id="configurator">
+            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
+                Build Your Perfect Surprise
+            </h3>
+            <p class="text-center text-lg max-w-2xl mx-auto mb-10 text-gray-700">
+                Drag the items below into the **Gift Box** to define your custom surprise. When you're ready, hit 'Order'!
+            </p>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- DRAGGABLE OPTIONS PANEL -->
+                <div class="lg:w-1/3 p-6 bg-favour-light rounded-2xl glowing-shadow space-y-4">
+                    <h4 class="text-2xl font-bold text-favour-pink border-b pb-3 border-favour-pink">Drag These Elements:</h4>
+                    
+                    <!-- Draggable Items -->
+                    <div id="item-balloons" data-item="Balloons" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
+                        <span class="text-3xl mr-3">🎈</span>
+                        <span class="text-xl font-medium">Vibrant Balloons</span>
+                    </div>
+                    
+                    <div id="item-teddy" data-item="Plush Teddy Bear" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
+                        <span class="text-3xl mr-3">🧸</span>
+                        <span class="text-xl font-medium">Plush Teddy Bear</span>
+                    </div>
+                    
+                    <div id="item-candy" data-item="Sweet Candy & Treats" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
+                        <span class="text-3xl mr-3">🍬</span>
+                        <span class="text-xl font-medium">Sweet Candy & Treats</span>
+                    </div>
+                    
+                    <div id="item-bouquet" data-item="Luxury Money Bouquet" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
+                        <span class="text-3xl mr-3">💐</span>
+                        <span class="text-xl font-medium">Luxury Money Bouquet</span>
+                    </div>
+
+                    <div id="item-moneybox" data-item="Money Box Surprise" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
+                        <span class="text-3xl mr-3">💵</span>
+                        <span class="text-xl font-medium">Money Box Surprise</span>
+                    </div>
+                    
+                    <div id="item-custom" data-item="Custom Gift Item" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
+                        <span class="text-3xl mr-3">✨</span>
+                        <span class="text-xl font-medium">Custom Gift Item</span>
+                    </div>
+
+                    <button onclick="clearCart()" class="mt-6 w-full py-2 bg-white text-favour-pink font-semibold rounded-full border border-favour-pink hover:bg-favour-light transition">
+                        Clear Cart
+                    </button>
+                </div>
+
+                <!-- VISUALIZATION & DROP ZONE -->
+                <div id="drop-zone" class="lg:w-2/3 p-8 bg-white rounded-2xl glowing-shadow border-4 border-favour-pink flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden transition-all duration-300">
+                    <h4 class="text-3xl font-extrabold text-favour-pink glowing-text mb-6">Your Custom Gift Box Preview</h4>
+                    
+                    <div id="gift-box-base" class="relative w-64 h-32 bg-favour-pink glowing-shadow rounded-xl border-8 border-white flex items-center justify-center transition-all duration-500">
+                        <span class="text-white text-xl font-bold">Drop Items Here!</span>
+                        <div id="gift-box-ribbon" class="absolute inset-0 bg-favour-glow opacity-30"></div>
+                    </div>
+
+                    <!-- Visualization Items (initially hidden) -->
+                    <div id="viz-Balloons" class="viz-item absolute -top-16 right-10 text-6xl">🎈</div>
+                    <div id="viz-Plush-Teddy-Bear" class="viz-item absolute bottom-4 left-4 text-6xl">🧸</div>
+                    <div id="viz-Sweet-Candy-&-Treats" class="viz-item absolute top-1/2 left-4 text-6xl">🍬</div>
+                    <div id="viz-Luxury-Money-Bouquet" class="viz-item absolute top-1/4 right-20 text-6xl">💐</div>
+                    <div id="viz-Money-Box-Surprise" class="viz-item absolute bottom-10 right-10 text-6xl">💵</div>
+                    <div id="viz-Custom-Gift-Item" class="viz-item absolute top-1/4 left-20 text-6xl">✨</div>
+
+                    <button onclick="openWhatsAppCart()" class="mt-8 px-8 py-3 glowing-bg text-white text-xl font-bold rounded-full hover:scale-105 transition duration-300 transform">
+                        Order My Custom Surprise (via WhatsApp)
+                    </button>
+                    <p id="cart-summary" class="mt-3 text-sm text-gray-600 font-semibold"></p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 7. AUTOMATIC SLIDER GALLERY -->
+        <section class="fade-in-up" id="gallery-section">
+            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
+                A Glimpse of Happiness
+            </h3>
+            
+            <div class="full-screen-slider-track rounded-3xl glowing-shadow bg-favour-light">
+                <!-- Image list starts here -->
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/SJMrvDv.jpeg" alt="Luxury Money Bouquet 1">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/Aza3r6s.jpeg" alt="Luxury Money Bouquet 2">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/kfHAlQ4.jpeg" alt="Luxury Money Bouquet 3">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/Mro65G2.jpeg" alt="Large Pink Teddy Bear">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/bSlXKXD.jpeg" alt="Cute Teddy Bear Arrangement">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/tBW2lJT.jpeg" alt="Gift Box with Balloons 1">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/KvEtW5d.jpeg" alt="Gift Box with Flowers">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/zdCwoKa.jpeg" alt="Gift Box with Custom Items">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/mVZ2pZk.jpeg" alt="Gift Box Arrangement 4">
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/Pyh4cmo.jpeg" alt="Elegant Gift Box">
+                <!-- Duplicate first image to help loop feeling -->
+                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/SJMrvDv.jpeg" alt="Luxury Money Bouquet (Loop End)">
+            </div>
+            <p class="text-center mt-4 text-gray-600 italic">Scroll left and right to view more beautiful arrangements!</p>
+        </section>
+
+
+        <!-- 8. LOCATION & CONTACT -->
+        <section class="py-16 fade-in-up" id="contact">
+            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
+                Connect With Us
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-favour-light p-8 md:p-12 rounded-3xl glowing-shadow">
+                
+                <!-- Contact Info -->
+                <div class="space-y-6">
+                    <h4 class="text-3xl font-bold text-favour-pink">Get Started!</h4>
+                    
+                    <!-- WhatsApp/Phone -->
+                    <div class="flex items-center space-x-4">
+                        <i data-lucide="phone" class="w-8 h-8 text-favour-glow"></i>
+                        <div>
+                            <p class="text-lg font-semibold text-gray-800">Call or WhatsApp:</p>
+                            <a href="https://wa.me/2349134158314?text=Hello%20Favours%20Surprises%2C%20I'd%20like%20to%20inquire%20about%20your%20surprise%20packages%20and%20pricing." target="_blank" class="text-2xl font-extrabold text-favour-pink hover:underline">09134158314</a>
+                            <p class="text-sm text-gray-600 mt-1 italic">Send us a DM to start planning!</p>
+                        </div>
+                    </div>
+
+                    <!-- TikTok -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Custom TikTok SVG logo for 'real' look -->
+                        <svg class="w-8 h-8 text-favour-glow" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12.5 12.875c1.455 0 2.625 1.17 2.625 2.625v1.75c0 .35-.285.625-.625.625h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-1.05-.85-1.875-1.875-1.875h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-.35.285-.625.625-.625h1.75zm1.75-6.125h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-1.05-.85-1.875-1.875-1.875h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-.35.285-.625.625-.625h1.75c1.455 0 2.625 1.17 2.625 2.625v1.75c0 .35.285.625.625.625h1.75c.34 0 .625.275.625.625v1.75c0 .35-.285.625-.625.625h-1.75zm-3.5 10.5h1.75c.34 0 .625.275.625.625v1.75c0 1.05.85 1.875 1.875 1.875h1.75c.34 0 .625.275.625.625v1.75c0 .35-.285.625-.625.625h-1.75c-1.455 0-2.625-1.17-2.625-2.625v-1.75c0-.35.285-.625.625-.625h1.75z"/>
+                        </svg>
+                        <div>
+                            <p class="text-lg font-semibold text-gray-800">Follow us on TikTok:</p>
+                            <a href="https://www.tiktok.com/@favours_surprises" target="_blank" class="text-2xl font-extrabold text-favour-pink hover:underline">@favours_surprises</a>
+                            <p class="text-sm text-gray-600 mt-1 italic">DM us for quick surprise ideas!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Info -->
+                <div class="space-y-6 lg:border-l lg:border-favour-pink lg:pl-12">
+                    <h4 class="text-3xl font-bold text-favour-pink">Delivery & Location</h4>
+                    
+                    <!-- Main Location -->
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800 flex items-center mb-1">
+                            <i data-lucide="map-pin" class="w-5 h-5 mr-2 text-favour-glow"></i>
+                            Our Base of Operations:
+                        </p>
+                        <p class="text-xl font-extrabold text-favour-pink">Ajayi Crowther University</p>
+                    </div>
+                    
+                    <!-- Delivery Area -->
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800 flex items-center mb-1">
+                            <i data-lucide="truck" class="w-5 h-5 mr-2 text-favour-glow"></i>
+                            Delivery Zone:
+                        </p>
+                        <p class="text-xl font-extrabold text-favour-pink">Anywhere in Ibadan</p>
+                        <p class="text-sm text-gray-600 mt-1">We bring the surprise right to their doorstep.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="p-6 text-center mt-12 border-t border-favour-light">
+        <p class="text-sm text-gray-500">&copy; 2024 Favours Surprises. All rights reserved. Made with love.</p>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- GLOBAL STATE ---
+        const IMAGE_URLS = [
+            "https://i.imgur.com/SJMrvDv.jpeg", "https://i.imgur.com/Aza3r6s.jpeg", "https://i.imgur.com/kfHAlQ4.jpeg", 
+            "https://i.imgur.com/Mro65G2.jpeg", "https://i.imgur.com/bSlXKXD.jpeg",  
+            "https://i.imgur.com/KvEtW5d.jpeg", "https://i.imgur.com/zdCwoKa.jpeg", "https://i.imgur.com/mVZ2pZk.jpeg", 
+            "https://i.imgur.com/3FNndV.jpeg"
+        ];
+        
+        let selectedItems = new Set(); 
+
+
+        // --- 1. INTRO MODAL LOGIC ---
+        function closeModal() {
+            const modal = document.getElementById('intro-modal');
+            modal.style.transform = 'scale(1.1)';
+            modal.style.opacity = '0';
+
+            setTimeout(() => {
+                modal.remove();
+                startImageSlider();
+                observeElements();
+            }, 500);
+        }
+        
+        // --- 2. IMAGE SLIDER (Carousel Scroll) LOGIC ---
+        let scrollInterval;
+        const slider = document.querySelector('.full-screen-slider-track');
+        const SLIDE_DURATION = 4000; 
+
+        function autoScroll() {
+            if (!slider) return;
+            
+            const maxScroll = slider.scrollWidth - slider.clientWidth;
+            const scrollStep = window.innerWidth * 0.95; // Same as item width + margin
+
+            // If we are at the end (or near the end of the real images), jump back to the start
+            if (slider.scrollLeft >= maxScroll - (scrollStep * 1.5)) {
+                slider.scrollLeft = 0;
+            } else {
+                // Scroll one step to the right
+                slider.scrollBy({ left: scrollStep, behavior: 'smooth' });
+            }
+        }
+
+        function startImageSlider() {
+             if (slider) {
+                // Wait for images to load before starting scroll
+                scrollInterval = setInterval(autoScroll, SLIDE_DURATION);
+             }
+        }
+        
+        // --- 3. SCROLL ANIMATION (Intersection Observer) LOGIC ---
+        const observerOptions = {
+            root: null, 
+            rootMargin: '0px',
+            threshold: 0.1 
+        };
+
+        function handleIntersect(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }
+
+        const observer = new IntersectionObserver(handleIntersect, observerOptions);
+
+        function observeElements() {
+            const animatedElements = document.querySelectorAll('.fade-in-up');
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // --- 4. GIFT CONFIGURATOR (Drag & Drop) LOGIC ---
+        function setupDragAndDrop() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZone = document.getElementById('drop-zone');
+            const WHATSAPP_NUMBER = '2349134158314';
+
+            // Drag Start
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', item.getAttribute('data-item'));
+                    e.target.style.opacity = '0.4';
+                });
+
+                item.addEventListener('dragend', (e) => {
+                    e.target.style.opacity = '1';
+                });
+            });
+
+            // Drop Zone Events
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault(); 
+                e.currentTarget.classList.add('drop-zone-active');
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.currentTarget.classList.remove('drop-zone-active');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('drop-zone-active');
+                
+                const data = e.dataTransfer.getData('text/plain');
+                if (data) {
+                    addItemToCart(data);
+                }
+            });
+        }
+        
+        function updateCartDisplay() {
+            const summaryEl = document.getElementById('cart-summary');
+            const vizElements = document.querySelectorAll('.viz-item');
+
+            // 1. Update Visualization
+            vizElements.forEach(el => el.classList.remove('active'));
+            
+            selectedItems.forEach(item => {
+                const normalizedItem = item.replace(/[^a-zA-Z0-9]/g, '-').replace(/-$/, '');
+                const vizEl = document.getElementById(`viz-${normalizedItem}`);
+                if (vizEl) {
+                    vizEl.classList.add('active');
+                }
+            });
+
+            // 2. Update Text Summary
+            if (selectedItems.size === 0) {
+                summaryEl.textContent = 'Your custom gift cart is empty. Drag items to add them!';
+            } else {
+                summaryEl.textContent = `Current Cart (${selectedItems.size} items): ${Array.from(selectedItems).join(', ')}.`;
+            }
+        }
+
+        function addItemToCart(item) {
+            if (!selectedItems.has(item)) {
+                selectedItems.add(item);
+                updateCartDisplay();
+            }
+        }
+        
+        function clearCart() {
+            selectedItems.clear();
+            updateCartDisplay();
+        }
+
+        function openWhatsAppCart() {
+            if (selectedItems.size === 0) {
+                // Instead of alert, use a subtle visual cue (like glowing the button) or log to console
+                console.error("Cart is empty. Please select items first.");
+                document.getElementById('drop-zone').classList.add('glowing-shadow');
+                setTimeout(() => document.getElementById('drop-zone').classList.remove('glowing-shadow'), 500);
+                return;
+            }
+
+            const itemsList = Array.from(selectedItems).map((item, index) => `${index + 1}. ${item}`).join('%0A'); // %0A is newline in URL
+            const message = `Hello Favours Surprises! I'm interested in ordering a customized surprise for my loved one. %0A%0A*My Custom Gift Cart*%0A${itemsList}%0A%0A---%0A%0APlease let me know the price for this combination and the next steps for delivery. Thank you!`;
+            
+            const WHATSAPP_NUMBER = '2349134158314';
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+
+        // Initial setup on window load
+        window.onload = function() {
+            setupDragAndDrop();
+            updateCartDisplay(); // Initialize empty cart display
+
+            // Note: Slider and IntersectionObserver are started by closeModal() 
+            // after the user dismisses the intro message.
+            setTimeout(() => {
+                 const modal = document.getElementById('intro-modal');
+                 if (modal) {
+                    // Modal is present, user must click to dismiss
+                 } else {
+                    // Fallback: start automatically
+                    startImageSlider();
+                    observeElements();
+                 }
+            }, 100);
+        };
+
+    </script>
+</body>
+</html>
