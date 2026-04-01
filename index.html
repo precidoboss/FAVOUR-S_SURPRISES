@@ -1,596 +1,1906 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scroll-behavior:smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Favours Surprises - Surprise Your loved one's!</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide Icons for social media logos -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        /* Custom Glowing Pink Color Palette & Font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        
-        :root {
-            --pink-base: #ff69b4; /* Hot Pink */
-            --pink-light: #ffc0cb; /* Light Pink */
-            --pink-glow: #ff4081; /* Neon Pink for glow */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0d0b0b">
+<title>hCASH × MOATS — LP Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0d0b0b;
+  --sur:#131010;
+  --card:#1a1515;
+  --bor:#2a2020;
+  --bor2:#3a2828;
+  --red:#e03535;
+  --red2:#ff4444;
+  --redg:rgba(224,53,53,.15);
+  --redgb:rgba(224,53,53,.08);
+  --white:#f5f0f0;
+  --dim:#8a7070;
+  --mut:#5a4545;
+  --grn:#3dba6a;
+  --gld:#d4a843;
+  --acc:#e03535;
+  --acc2:#ff5555;
+  --txt:#f0e8e8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;min-height:100dvh}
 
-        body {
-            font-family: 'Playfair Display', serif;
-            background-color: #ffffff;
-            color: #1a1a1a;
-            overflow-x: hidden;
-        }
-        
-        /* Custom Tailwind Configuration */
-        .glowing-shadow {
-            box-shadow: 0 0 15px var(--pink-glow), 0 0 5px var(--pink-base) inset;
-        }
+/* grain overlay */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
 
-        .glowing-text {
-            text-shadow: 0 0 8px var(--pink-glow);
-        }
+/* scanline effect */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:0}
 
-        .glowing-bg {
-            background-color: var(--pink-base);
-            box-shadow: 0 0 20px var(--pink-glow);
-        }
-        
-        /* Custom CSS for Animations (Hidden by default) */
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
+/* ── TICKER BAR ── */
+.tkbar{background:var(--red);height:28px;overflow:hidden;display:flex;align-items:center;position:relative;z-index:20}
+.tkin{display:inline-flex;gap:48px;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#fff;font-weight:500;letter-spacing:.05em;animation:tka 60s linear infinite;will-change:transform}
+@keyframes tka{to{transform:translateX(-50%)}}
+.tks{color:rgba(255,255,255,.5);margin:0 4px}
 
-        /* Class added by JS to trigger the animation */
-        .fade-in-up.animate {
-            opacity: 1;
-            transform: translateY(0);
-        }
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:200;border-bottom:1px solid var(--bor2);background:rgba(13,11,11,.96);backdrop-filter:blur(24px);padding:0 .85rem;display:flex;align-items:center;justify-content:space-between;height:58px;gap:8px}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.12em;color:var(--txt);flex-shrink:0;text-decoration:none}
+.logo-img{width:38px;height:38px;border-radius:9px;object-fit:cover;flex-shrink:0;border:2px solid var(--red)}
+.logo em{color:var(--red);font-style:normal}
+.logo span{color:var(--dim);font-size:.95rem}
+.navtabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.navtabs::-webkit-scrollbar{display:none}
+.tab{padding:6px 11px;border-radius:7px;cursor:pointer;color:var(--mut);transition:all .15s;border:1px solid transparent;font-family:'JetBrains Mono',monospace;font-size:.58rem;white-space:nowrap;user-select:none;flex-shrink:0;letter-spacing:.04em}
+.tab:hover{color:var(--txt);background:rgba(224,53,53,.07)}
+.tab.on{color:var(--red);background:rgba(224,53,53,.12);border-color:rgba(224,53,53,.3)}
+.hdr-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 
-        /* Full Screen Slider Styling */
-        .full-screen-slider-track {
-            display: flex;
-            overflow-x: scroll;
-            scroll-snap-type: x mandatory; /* Snap to images */
-            -webkit-overflow-scrolling: touch;
-            width: 100vw; /* Take full viewport width */
-            margin-left: calc(50% - 50vw); /* Center the full-width block */
-            height: 70vh;
-        }
+/* ── LIVE BADGE ── */
+.live{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--grn)}
+.ld{width:6px;height:6px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);animation:pulse 1.8s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
 
-        .full-screen-slide-item {
-            flex: 0 0 95vw; /* Each slide takes 95% of viewport width */
-            height: 70vh; /* Fixed height for visual consistency */
-            scroll-snap-align: center;
-            object-fit: cover;
-            margin-right: 5vw; /* Gap between images to show the next one */
-            transition: transform 0.5s ease;
-        }
-        
-        /* Custom style for the fixed contact button */
-        #whatsapp-fixed-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 50;
-            transition: transform 0.3s ease;
-        }
-        
-        #whatsapp-fixed-btn:hover {
-            transform: scale(1.1);
-        }
+/* ── MAIN ── */
+main{position:relative;z-index:1;padding:.85rem;max-width:1400px;margin:0 auto}
+@media(min-width:768px){main{padding:1.1rem}}
+.view{display:none}.view.on{display:block}
 
-        /* Bike Man Delivery Animation */
-        @keyframes ride {
-            0% { transform: translateX(-100vw); }
-            100% { transform: translateX(200vw); } /* Move across and off screen */
-        }
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.95rem;gap:8px}
+.sh-t{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;color:var(--txt);display:flex;align-items:center;gap:10px}
+.sh-t::before{content:'';width:3px;height:18px;background:var(--red);border-radius:99px;flex-shrink:0}
 
-        #bike-man {
-            position: fixed;
-            bottom: 50px; /* Near the bottom */
-            z-index: 10;
-            font-size: 3rem;
-            animation: ride 30s linear infinite; /* Slow, constant speed */
-        }
+/* ── STAT GRID ── */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;margin-bottom:.9rem}
+@media(min-width:460px){.sg{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.sg{grid-template-columns:repeat(5,1fr)}}
+.sc{background:var(--card);border:1px solid var(--bor);border-radius:11px;padding:.85rem;transition:border-color .2s;position:relative;overflow:hidden}
+.sc:hover{border-color:rgba(224,53,53,.25)}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0;transition:.2s}
+.sc:hover::after{opacity:1}
+.sl{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.04em;line-height:1;transition:color .3s}
+.ss{font-size:.6rem;color:var(--mut);margin-top:2px;font-family:'JetBrains Mono',monospace}
+.cr{color:var(--red)}.cg{color:var(--gld)}.cgn{color:var(--grn)}.cw{color:var(--white)}
 
-        /* Drag Item Styling */
-        .drag-item {
-            cursor: grab;
-            transition: transform 0.2s;
-            user-select: none;
-        }
-        
-        /* Drop Zone Active State */
-        .drop-zone-active {
-            border-color: var(--pink-glow) !important;
-            box-shadow: 0 0 30px var(--pink-glow) !important;
-        }
-        
-        /* Visualization Item Animation for drop-in effect */
-        .viz-item {
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Springy transition */
-            transform: scale(0);
-        }
-        
-        .viz-item.active {
-            transform: scale(1);
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'favour-pink': 'var(--pink-base)',
-                        'favour-glow': 'var(--pink-glow)',
-                        'favour-light': 'var(--pink-light)',
-                    },
-                }
-            }
-        }
-    </script>
+/* ── PANELS ── */
+.panel{background:var(--card);border:1px solid var(--bor);border-radius:13px;overflow:hidden;margin-bottom:.85rem}
+.ph{padding:.75rem 1rem;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ptitle{font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.08em;display:flex;align-items:center;gap:7px}
+.pb{padding:1rem}.pb0{padding:0}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr;gap:.85rem}
+@media(min-width:720px){.g2{grid-template-columns:1fr 1fr}}
+.gsb{display:grid;grid-template-columns:1fr;gap:.85rem}
+@media(min-width:1024px){.gsb{grid-template-columns:1fr 320px}}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:'JetBrains Mono',monospace;font-size:.5rem;text-transform:uppercase;letter-spacing:.09em;color:var(--mut);padding:.5rem .75rem;text-align:left;border-bottom:1px solid var(--bor);white-space:nowrap}
+.tbl td{padding:.58rem .75rem;font-size:.75rem;border-bottom:1px solid rgba(42,32,32,.4);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(224,53,53,.03)}
+.tw{overflow-x:auto}
+
+/* ── RANK ── */
+.rk{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.r1{background:rgba(212,168,67,.14);color:var(--gld);border:1px solid rgba(212,168,67,.28)}
+.r2{background:rgba(160,160,170,.08);color:#9aa0a8;border:1px solid rgba(160,160,170,.18)}
+.r3{background:rgba(140,90,60,.1);color:#a07050;border:1px solid rgba(140,90,60,.22)}
+.rn{background:rgba(80,60,60,.1);color:var(--mut);border:1px solid var(--bor)}
+
+/* ── BUTTONS ── */
+.btn{padding:.6rem 1.1rem;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .17s;white-space:nowrap;letter-spacing:.04em}
+.btn:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(224,53,53,.3)}
+.btn:active{transform:translateY(0)}
+.btn-sm{padding:.3rem .7rem;font-size:.58rem}
+.btn-g{background:transparent;color:var(--red);border:1px solid rgba(224,53,53,.3)}.btn-g:hover{background:rgba(224,53,53,.08);box-shadow:none;transform:none}
+.btn-w{background:rgba(245,240,240,.06);color:var(--txt);border:1px solid var(--bor2)}.btn-w:hover{background:rgba(245,240,240,.1);box-shadow:none;transform:none}
+.btn-grn{background:var(--grn);color:#fff}.btn-grn:hover{background:#4dca7a;box-shadow:0 4px 16px rgba(61,186,106,.25)}
+
+/* ── INPUTS ── */
+.inp{width:100%;padding:.6rem .85rem;background:var(--sur);border:1px solid var(--bor2);border-radius:8px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:.72rem;outline:none;transition:border-color .18s}
+.inp::placeholder{color:var(--mut)}
+.inp:focus{border-color:var(--red)}
+select.inp{cursor:pointer}
+
+/* ── BAR ── */
+.bw{display:flex;align-items:center;gap:6px}
+.bt{flex:1;height:3px;background:var(--bor);border-radius:99px;overflow:hidden;min-width:28px}
+.bf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--red),var(--red2));transition:width .8s}
+
+/* ── EVENTS ── */
+.evf{max-height:340px;overflow-y:auto;padding:.55rem .85rem}
+.evf::-webkit-scrollbar{width:2px}
+.evf::-webkit-scrollbar-thumb{background:var(--bor2);border-radius:99px}
+.ei{display:flex;gap:8px;align-items:flex-start;padding:.48rem 0;border-bottom:1px solid rgba(42,32,32,.3)}
+.ei:last-child{border-bottom:none}
+.ei.new-ev{animation:nev .8s ease}
+@keyframes nev{0%{background:rgba(224,53,53,.1);border-radius:6px}100%{background:transparent}}
+
+/* ── SPIN ── */
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--bor2);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── WALLET ADDR ── */
+.wa{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--red);cursor:pointer}
+.wa:hover{text-decoration:underline}
+
+/* ── MINER GRID ── */
+.mg{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:.9rem}
+@media(min-width:500px){.mg{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:800px){.mg{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1100px){.mg{grid-template-columns:repeat(5,1fr)}}
+.mc{background:var(--card);border:1px solid var(--bor);border-radius:13px;overflow:hidden;cursor:pointer;transition:all .2s}
+.mc:hover{border-color:rgba(224,53,53,.35);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.mc-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--sur)}
+.mc-body{padding:.65rem .75rem}
+.mc-name{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;color:var(--txt);line-height:1.3;margin-bottom:.3rem}
+.mc-stat{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut)}
+.mc-stat span{color:var(--red)}
+
+/* ── MINER DETAIL ── */
+.miner-hero{background:var(--card);border:1px solid var(--bor2);border-radius:14px;overflow:hidden;margin-bottom:.85rem;display:grid;grid-template-columns:180px 1fr;gap:0}
+@media(max-width:600px){.miner-hero{grid-template-columns:1fr}}
+.miner-hero-img{width:100%;height:180px;object-fit:cover;display:block;background:var(--sur)}
+@media(max-width:600px){.miner-hero-img{height:220px}}
+.miner-hero-body{padding:1.1rem}
+.miner-hero-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--txt);line-height:1.1;margin-bottom:.5rem}
+.miner-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-top:.85rem}
+.miner-stat-card{background:var(--sur);border:1px solid var(--bor);border-radius:9px;padding:.65rem}
+.miner-stat-label{font-family:'JetBrains Mono',monospace;font-size:.49rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);margin-bottom:.25rem}
+.miner-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;color:var(--txt)}
+.miner-stat-sub{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--dim);margin-top:1px}
+
+/* ── LP INTERFACE ── */
+.lp-hero{background:linear-gradient(135deg,rgba(224,53,53,.08),rgba(212,168,67,.06));border:1px solid rgba(224,53,53,.25);border-radius:14px;padding:1.1rem;margin-bottom:.85rem}
+.lp-tabs{display:flex;gap:4px;margin-bottom:.85rem;overflow-x:auto;scrollbar-width:none;padding:2px}
+.lp-tabs::-webkit-scrollbar{display:none}
+.lp-tab{padding:6px 13px;border-radius:7px;cursor:pointer;color:var(--mut);transition:all .15s;border:1px solid var(--bor);font-family:'JetBrains Mono',monospace;font-size:.58rem;white-space:nowrap;user-select:none;background:var(--sur)}
+.lp-tab.on{color:var(--red);background:rgba(224,53,53,.12);border-color:rgba(224,53,53,.3)}
+.lp-tab:hover:not(.on){color:var(--txt);background:rgba(224,53,53,.05)}
+.lp-pane{display:none}.lp-pane.on{display:block}
+
+/* ── SWAP UI ── */
+.swap-box{background:var(--sur);border:1px solid var(--bor2);border-radius:12px;padding:.9rem;margin-bottom:.5rem}
+.swap-amt{background:transparent;border:none;outline:none;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.04em;color:var(--txt);width:100%;min-width:0}
+.swap-amt::placeholder{color:var(--mut)}
+.token-chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--bor2);border-radius:9px;padding:6px 12px;cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;white-space:nowrap}
+.token-chip.sel{border-color:var(--red);background:rgba(224,53,53,.1);color:var(--red)}
+.token-chip:hover:not(.sel){border-color:var(--bor2);background:rgba(245,240,240,.05)}
+.token-chip img{width:20px;height:20px;border-radius:50%;object-fit:cover}
+.swap-arrow{text-align:center;font-size:1.2rem;color:var(--mut);margin:.2rem 0;cursor:pointer;transition:transform .2s}
+.swap-arrow:hover{transform:rotate(180deg);color:var(--red)}
+
+/* ── LOCK DURATION GRID ── */
+.lock-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}
+@media(min-width:500px){.lock-grid{grid-template-columns:repeat(4,1fr)}}
+.lock-opt{background:var(--sur);border:1.5px solid var(--bor);border-radius:9px;padding:.65rem;text-align:center;cursor:pointer;transition:all .18s}
+.lock-opt.sel{border-color:var(--gld);background:rgba(212,168,67,.1)}
+.lock-opt:hover:not(.sel){border-color:var(--bor2)}
+.lock-opt-mult{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.05em;color:var(--gld)}
+.lock-opt-days{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);margin-top:2px}
+
+/* ── FORT SCORE ── */
+.fort-ring{position:relative;display:inline-block;width:80px;height:80px}
+.fort-ring svg{transform:rotate(-90deg)}
+.fort-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.04em;color:var(--red)}
+
+/* ── STEP TRACKER ── */
+.step-track{display:flex;gap:0;margin-bottom:.9rem}
+.step-item{flex:1;padding:.5rem .4rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut);cursor:default;transition:all .15s;border-right:1px solid var(--bor);background:var(--sur);position:relative}
+.step-item:last-child{border-right:none}
+.step-item.done{color:var(--grn);background:rgba(61,186,106,.06)}
+.step-item.active{color:var(--red);background:rgba(224,53,53,.08)}
+.step-num{display:block;font-size:.75rem;font-weight:700;margin-bottom:1px}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;top:70px;right:14px;z-index:600;max-width:340px;padding:.75rem 1rem;border-radius:11px;font-family:'JetBrains Mono',monospace;font-size:.66rem;line-height:1.5;border:1px solid;display:flex;align-items:flex-start;gap:9px;transform:translateX(380px);transition:transform .3s cubic-bezier(.4,0,.2,1);pointer-events:none;backdrop-filter:blur(12px)}
+.notif.show{transform:translateX(0)}
+.notif.ok{background:rgba(61,186,106,.12);border-color:rgba(61,186,106,.3);color:var(--grn)}
+.notif.err{background:rgba(224,53,53,.12);border-color:rgba(224,53,53,.3);color:var(--red2)}
+.notif.info{background:rgba(212,168,67,.1);border-color:rgba(212,168,67,.25);color:var(--gld)}
+
+/* ── LOADING SHIMMER ── */
+.shimmer{background:linear-gradient(90deg,var(--card) 25%,var(--sur) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── WALLET CONNECT BANNER ── */
+.connect-banner{background:linear-gradient(135deg,rgba(224,53,53,.12),rgba(224,53,53,.04));border:1.5px solid rgba(224,53,53,.3);border-radius:14px;padding:1.5rem;text-align:center;margin-bottom:.9rem}
+
+/* ── PRICE CHIP ── */
+.price-chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--bor);border-radius:8px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.6rem}
+.price-chip img{width:16px;height:16px;border-radius:50%}
+.up{color:var(--grn)}.dn{color:var(--red)}
+
+/* ── WALLET BADGE ── */
+.wallet-badge{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--bor2);border-radius:99px;padding:.35rem .85rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;cursor:pointer;transition:all .15s}
+.wallet-badge:hover{border-color:var(--red);background:rgba(224,53,53,.06)}
+.wallet-dot{width:8px;height:8px;border-radius:50%;background:var(--grn);box-shadow:0 0 6px var(--grn)}
+
+/* ── PROGRESS BAR ── */
+.prog-bar{height:5px;background:var(--bor);border-radius:99px;overflow:hidden;margin:.5rem 0}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--red),var(--red2));transition:width .5s ease}
+
+/* ── REFRESH BTN ── */
+.rfbtn{padding:5px 10px;background:transparent;border:1px solid var(--bor);border-radius:7px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:.6rem;cursor:pointer;transition:all .15s}
+.rfbtn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── DETAIL BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:.55rem;padding:2px 7px;border-radius:4px;background:rgba(224,53,53,.1);color:var(--red);border:1px solid rgba(224,53,53,.2)}
+.badge-gld{background:rgba(212,168,67,.1);color:var(--gld);border-color:rgba(212,168,67,.2)}
+.badge-grn{background:rgba(61,186,106,.1);color:var(--grn);border-color:rgba(61,186,106,.2)}
+
+/* ── FOOTER ── */
+.foot{position:relative;z-index:1;text-align:center;padding:2rem .85rem 3rem;border-top:1px solid var(--bor);margin-top:.5rem}
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-    <!-- BIKE MAN DELIVERY ANIMATION (Hidden on small screens) -->
-    <div id="bike-man" class="hidden md:block">
-        <span role="img" aria-label="Delivery rider on a scooter with a gift box" class="text-favour-pink glowing-text">🛵📦💖</span>
+<!-- ── TICKER ── -->
+<div class="tkbar">
+  <div class="tkin" id="ticker">
+    <span>hCASH/wAVAX LP<span class="tks">·</span></span>
+    <span>Deposit LP → Stake or Lock → Earn Points<span class="tks">·</span></span>
+    <span>Fort Score = All Moat Points Summed<span class="tks">·</span></span>
+    <span>Lock up to 730 days for 5× multiplier<span class="tks">·</span></span>
+    <span>Burn = 10× permanent · Stake = 1× flexible<span class="tks">·</span></span>
+    <span>0.5% fee on unstake / unlock<span class="tks">·</span></span>
+    <span>hCASH × MOATS LP Intelligence<span class="tks">·</span></span>
+    <span>hCASH/wAVAX LP<span class="tks">·</span></span>
+    <span>Deposit LP → Stake or Lock → Earn Points<span class="tks">·</span></span>
+    <span>Fort Score = All Moat Points Summed<span class="tks">·</span></span>
+    <span>Lock up to 730 days for 5× multiplier<span class="tks">·</span></span>
+    <span>Burn = 10× permanent · Stake = 1× flexible<span class="tks">·</span></span>
+    <span>0.5% fee on unstake / unlock<span class="tks">·</span></span>
+    <span>hCASH × MOATS LP Intelligence<span class="tks">·</span></span>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <a class="logo" href="#">
+    <img class="logo-img" src="https://raw.githubusercontent.com/precidoboss/my-game-sprites/main/hashcashclub.png" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect width=%2238%22 height=%2238%22 rx=%229%22 fill=%22%23e03535%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2218%22 fill=%22white%22>₿</text></svg>'" alt="hCASH">
+    h<em>CASH</em><span>× MOATS</span>
+  </a>
+  <nav class="navtabs">
+    <div class="tab on" data-v="overview" onclick="nav(this)">⬡ Overview</div>
+    <div class="tab" data-v="lp" onclick="nav(this)">💧 LP + Moat</div>
+    <div class="tab" data-v="swap" onclick="nav(this)">🔀 Swap</div>
+    <div class="tab" data-v="miners" onclick="nav(this)">⛏ Miners</div>
+    <div class="tab" data-v="leaderboard" onclick="nav(this)">🏆 Leaderboard</div>
+    <div class="tab" data-v="calculator" onclick="nav(this)">📐 Calculator</div>
+  </nav>
+  <div class="hdr-r">
+    <span class="live"><span class="ld"></span><span id="liveTs" style="font-family:'JetBrains Mono',monospace;font-size:.56rem;display:none">LIVE</span></span>
+    <div id="walletBadge" class="wallet-badge" onclick="connectWallet()">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--mut)" id="walletLabel">Connect</span>
+    </div>
+    <button class="rfbtn" onclick="loadAll()">↺</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ══ OVERVIEW ══ -->
+<div id="view-overview" class="view on">
+  <div class="sh">
+    <div class="sh-t">hCASH LP Moat — Live Dashboard</div>
+    <span class="live" id="ovLive" style="display:none"><span class="ld"></span>Updated</span>
+  </div>
+
+  <!-- Hero stat row -->
+  <div class="sg">
+    <div class="sc"><div class="sl">hCASH Price</div><div class="sv cr" id="ovPrice">—</div><div class="ss" id="ovPriceCh"></div></div>
+    <div class="sc"><div class="sl">LP Participants</div><div class="sv cw" id="ovWallets">—</div><div class="ss">wallets staking LP</div></div>
+    <div class="sc"><div class="sl">Pool Points</div><div class="sv cg" id="ovPoints">—</div><div class="ss">hCASH moat total</div></div>
+    <div class="sc"><div class="sl">Top Wallet Pts</div><div class="sv cr" id="ovTopPts">—</div><div class="ss" id="ovTopWallet" style="font-family:'JetBrains Mono',monospace;font-size:.5rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div></div>
+    <div class="sc"><div class="sl">Recent Events</div><div class="sv cgn" id="ovEvents">—</div><div class="ss">last 24h</div></div>
+  </div>
+
+  <!-- Price + LP info -->
+  <div class="g2">
+    <div class="panel">
+      <div class="ph"><div class="ptitle">💧 LP Pool Snapshot</div><span class="live"><span class="ld"></span></span></div>
+      <div class="pb">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.75rem">
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:.75rem;display:flex;align-items:center;gap:10px">
+            <img src="https://assets.coingecko.com/coins/images/15075/small/wrapped-avax.png" style="width:30px;height:30px;border-radius:50%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2230%22><circle cx=%2215%22 cy=%2215%22 r=%2215%22 fill=%22%23e84142%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22white%22>A</text></svg>'">
+            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em" id="lpReserveWavax">—</div><div style="font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut)">WAVAX in pool</div></div>
+          </div>
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:.75rem;display:flex;align-items:center;gap:10px">
+            <img src="https://raw.githubusercontent.com/precidoboss/my-game-sprites/main/hashcashclub.png" style="width:30px;height:30px;border-radius:50%;object-fit:cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2230%22><circle cx=%2215%22 cy=%2215%22 r=%2215%22 fill=%22%23e03535%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22white%22>₿</text></svg>'">
+            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em" id="lpReserveHcash">—</div><div style="font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut)">hCASH in pool</div></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem">
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:.6rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.04em;color:var(--gld)" id="lpTotalSupply">—</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.49rem;color:var(--mut)">LP Total Supply</div>
+          </div>
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:.6rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.04em;color:var(--red)" id="lpStakedInMoat">—</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.49rem;color:var(--mut)">LP in Moat</div>
+          </div>
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:.6rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.04em;color:var(--grn)" id="lpMoatPct">—</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.49rem;color:var(--mut)">% Staked in Moat</div>
+          </div>
+        </div>
+        <div class="prog-bar" style="margin-top:.85rem"><div class="prog-fill" id="lpProgFill" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut);margin-top:.3rem">
+          <span>LP staked in moat</span><span id="lpProgLabel">0%</span>
+        </div>
+      </div>
     </div>
 
-    <!-- 1. INTRO MODAL - Love Message -->
-    <div id="intro-modal" class="fixed inset-0 z-[100] bg-white bg-opacity-95 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-favour-light p-8 md:p-12 rounded-3xl glowing-shadow max-w-lg text-center transform scale-90 md:scale-100 transition duration-500 ease-out">
-            <h2 class="text-3xl md:text-5xl glowing-text text-favour-pink mb-4 font-extrabold">A Message For You...</h2>
-            <p class="text-xl md:text-2xl text-gray-800 mb-6">
-                "Every great love story deserves its perfect chapter. Let us help you write yours with a surprise they'll cherish forever."
-            </p>
-            <button onclick="closeModal()" class="px-8 py-3 bg-favour-pink text-white text-lg font-semibold rounded-full hover:bg-favour-glow transition duration-300 glowing-shadow">
-                Enter The World of Surprises
-            </button>
+    <div class="panel">
+      <div class="ph"><div class="ptitle">📡 Live Events</div><span class="live"><span class="ld"></span></span></div>
+      <div class="evf" id="ovEvFd"><div style="padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--mut)">Loading events…</div></div>
+    </div>
+  </div>
+
+  <!-- Moat mechanics explainer -->
+  <div class="panel">
+    <div class="ph"><div class="ptitle">⚙️ How the hCASH LP Moat Works</div></div>
+    <div class="pb">
+      <div style="display:grid;grid-template-columns:1fr;gap:.65rem">
+        <div style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:.5rem">
+          The <b style="color:var(--txt)">hCASH LP Moat</b> is a special liquidity provision moat. Unlike regular moats where you stake the token directly, here you:
         </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem">
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:.85rem">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.05em;color:var(--red);margin-bottom:.4rem">STEP 1 — PROVIDE LP</div>
+            <div style="font-size:.72rem;color:var(--dim);line-height:1.6">Pair equal-value <b style="color:var(--txt)">AVAX + hCASH</b> on Pharaoh Exchange. You receive <b style="color:var(--gld)">Volatile LP tokens</b> representing your share of the pool. This earns you trading fees 24/7.</div>
+          </div>
+          <div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:.85rem">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.05em;color:var(--gld);margin-bottom:.4rem">STEP 2 — DEPOSIT LP</div>
+            <div style="font-size:.72rem;color:var(--dim);line-height:1.6">Stake or Lock your LP tokens in the hCASH Moat. <b style="color:var(--txt)">Stake</b> for 1× points with flexible exit. <b style="color:var(--txt)">Lock</b> for 90–730 days to earn 2.73× to 5.00× multipliers.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem">
+          <div style="background:var(--card);border:1px solid var(--bor);border-radius:9px;padding:.65rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em;color:var(--txt)">1×</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">Stake</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px">Flexible</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--bor);border-radius:9px;padding:.65rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em;color:var(--gld)">2.73×</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">Lock 90d</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px">3 months</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--bor);border-radius:9px;padding:.65rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em;color:var(--gld)">4.00×</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">Lock 365d</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px">1 year</div>
+          </div>
+          <div style="background:var(--card);border:1px solid rgba(224,53,53,.3);border-radius:9px;padding:.65rem;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em;color:var(--red)">5.00×</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">Lock 730d</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px">Maximum</div>
+          </div>
+        </div>
+        <div style="background:rgba(212,168,67,.07);border:1px solid rgba(212,168,67,.2);border-radius:9px;padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--gld);line-height:1.6">
+          🏰 Your <b>Fort Score</b> = sum of all your Moat Points across all moats. It determines your share of the Early User Airdrop. Burn is disabled for the hCASH LP Moat.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LP + MOAT ══ -->
+<div id="view-lp" class="view">
+  <div class="sh">
+    <div class="sh-t">💧 LP + Moat Management</div>
+    <a href="https://www.phar.gg/liquidity" target="_blank" class="btn btn-sm btn-g" style="text-decoration:none">Open Pharaoh ↗</a>
+  </div>
+
+  <!-- Wallet connect -->
+  <div id="lpWalletBanner" class="connect-banner" style="display:none">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.08em;margin-bottom:.5rem">Connect Wallet to Manage Positions</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--dim);margin-bottom:1rem">Add AVAX+hCASH liquidity, stake LP, lock for multipliers, and claim rewards</div>
+    <button class="btn" onclick="connectWallet()">🔗 Connect Wallet</button>
+  </div>
+
+  <!-- My position summary (shown when connected) -->
+  <div id="lpPositionSummary" style="display:none">
+    <div class="sg" style="grid-template-columns:repeat(2,1fr)">
+      <div class="sc" style="grid-column:span 2">
+        <div class="sl">Connected Wallet</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--red);margin-top:2px" id="lpConnectedAddr">—</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-bottom:.85rem">
+      <div class="sc" style="display:flex;align-items:center;gap:10px">
+        <img src="https://assets.coingecko.com/coins/images/15075/small/wrapped-avax.png" style="width:28px;height:28px;border-radius:50%" onerror="this.style.display='none'">
+        <div><div class="sl">AVAX Balance</div><div class="sv" id="myAvax">—</div></div>
+      </div>
+      <div class="sc" style="display:flex;align-items:center;gap:10px">
+        <img src="https://raw.githubusercontent.com/precidoboss/my-game-sprites/main/hashcashclub.png" style="width:28px;height:28px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">
+        <div><div class="sl">hCASH Balance</div><div class="sv" id="myHcash">—</div></div>
+      </div>
+      <div class="sc">
+        <div class="sl">LP in Wallet</div>
+        <div class="sv cg" id="myLpWallet">—</div>
+        <div class="ss">WAVAX/hCASH LP tokens</div>
+      </div>
+      <div class="sc">
+        <div class="sl">LP Staked in Moat</div>
+        <div class="sv cr" id="myLpStaked">—</div>
+        <div class="ss">earning Moat Points</div>
+      </div>
+      <div class="sc">
+        <div class="sl">My Moat Points</div>
+        <div class="sv cr" id="myMoatPts">—</div>
+        <div class="ss">hCASH moat</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Fort Score</div>
+        <div class="sv cg" id="myFortScore">—</div>
+        <div class="ss">airdrop weight</div>
+      </div>
     </div>
 
-    <!-- 2. FIXED WHATSAPP BUTTON -->
-    <a id="whatsapp-fixed-btn" href="https://wa.me/2349134158314?text=I'm%20ready%20to%20plan%20a%20surprise!" target="_blank" aria-label="Chat on WhatsApp" class="p-4 rounded-full glowing-bg text-white hover:glowing-shadow transition duration-300">
-        <i data-lucide="message-square-text" class="w-8 h-8"></i>
-    </a>
+    <!-- Pending rewards -->
+    <div id="lpRewardsPanel" class="panel" style="display:none">
+      <div class="ph"><div class="ptitle">🎁 Pending Rewards</div><button class="btn btn-sm btn-grn" onclick="claimRewards()">Claim All</button></div>
+      <div class="pb"><div id="lpRewardsContent"></div><div id="lpClaimStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.4rem"></div></div>
+    </div>
+  </div>
 
-    <!-- 3. HEADER -->
-    <header class="p-6 sticky top-0 bg-white z-20 shadow-lg glowing-shadow shadow-favour-light">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold glowing-text text-favour-pink uppercase tracking-widest">
-                Favours Surprises
-            </h1>
-            <nav>
-                <!-- Hidden on mobile, simple links -->
-                <a href="#services" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Services</a>
-                <a href="#configurator" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Build</a>
-                <a href="#gallery-section" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Gallery</a>
-                <a href="#contact" class="hidden sm:inline text-lg text-favour-pink font-medium mx-4 hover:glowing-text transition">Contact</a>
-            </nav>
+  <!-- LP action tabs -->
+  <div class="lp-hero">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;color:var(--gld)">WAVAX / hCASH Volatile LP</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim);margin-top:2px">Pharaoh Exchange · hCASH LP Moat</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut)">1 AVAX ≈</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.04em;color:var(--red)" id="lpRate">— hCASH</div>
+      </div>
+    </div>
+    <div class="lp-tabs">
+      <div class="lp-tab on" data-p="addlp" onclick="lpTab(this)">💧 Add LP</div>
+      <div class="lp-tab" data-p="stake" onclick="lpTab(this)">🔒 Stake LP</div>
+      <div class="lp-tab" data-p="lock" onclick="lpTab(this)">⏳ Lock LP</div>
+      <div class="lp-tab" data-p="unstake" onclick="lpTab(this)">↩ Unstake</div>
+      <div class="lp-tab" data-p="removelp" onclick="lpTab(this)">🔥 Remove LP</div>
+      <div class="lp-tab" data-p="locks" onclick="lpTab(this)">🔐 My Locks</div>
+    </div>
+
+    <!-- ADD LP PANE -->
+    <div id="lp-pane-addlp" class="lp-pane on">
+      <div style="font-size:.72rem;color:var(--dim);margin-bottom:.85rem;line-height:1.65">
+        Pair <b style="color:var(--txt)">AVAX + hCASH</b> 50/50 by value on Pharaoh. Enter your AVAX amount — the required hCASH is auto-calculated from current reserves.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.7rem">
+        <div>
+          <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">AVAX Amount <span id="lpAvaxBal" style="color:var(--dim)"></span></label>
+          <div style="display:flex;gap:5px">
+            <input class="inp" id="lpAvaxAmt" type="number" placeholder="0.0" oninput="lpQuote()" min="0">
+            <button class="btn btn-sm btn-g" onclick="lpMaxAvax()">MAX</button>
+          </div>
         </div>
-    </header>
+        <div>
+          <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">hCASH Required <span id="lpHcashBal" style="color:var(--dim)"></span></label>
+          <input class="inp" id="lpHcashAmt" type="number" placeholder="auto-calculated" readonly style="opacity:.7">
+        </div>
+      </div>
+      <div id="lpAddPreview" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--grn);min-height:1.2rem;margin-bottom:.7rem"></div>
+      <div style="background:rgba(212,168,67,.07);border:1px solid rgba(212,168,67,.2);border-radius:8px;padding:.65rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--gld);margin-bottom:.75rem;line-height:1.6">
+        ⚠️ Slippage: 1% default. After adding LP you will receive LP tokens in your wallet. Then go to <b>Stake LP</b> or <b>Lock LP</b> to deposit them in the Moat.
+      </div>
+      <button class="btn" style="width:100%" onclick="lpAdd()" id="lpAddBtn">💧 Add Liquidity on Pharaoh</button>
+      <div id="lpAddStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.5rem"></div>
+    </div>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8">
+    <!-- STAKE LP PANE -->
+    <div id="lp-pane-stake" class="lp-pane">
+      <div style="font-size:.72rem;color:var(--dim);margin-bottom:.75rem;line-height:1.65">
+        Stake LP tokens in the hCASH Moat for <b style="color:var(--txt)">1× Moat Points</b>. Flexible — unstake anytime with 0.5% fee.
+      </div>
+      <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">LP Tokens to Stake <span id="stakeAvailLp" style="color:var(--dim)"></span></label>
+      <div style="display:flex;gap:5px;margin-bottom:.5rem">
+        <input class="inp" id="stakeAmt" type="number" placeholder="0.0" oninput="calcStakePts()" min="0">
+        <button class="btn btn-sm btn-g" onclick="stakeMax()">MAX</button>
+      </div>
+      <div id="stakePtsPreview" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);margin-bottom:.75rem;min-height:1.2rem"></div>
+      <button class="btn" style="width:100%" onclick="stakeLp()">🔒 Stake LP in Moat</button>
+      <div id="stakeStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.5rem"></div>
+    </div>
 
-        <!-- 4. HERO SECTION -->
-        <section class="py-16 md:py-24 text-center fade-in-up" id="hero">
-            <h2 class="text-5xl md:text-8xl font-black text-favour-pink glowing-text mb-6 leading-tight">
-                Surprise Your <span class="text-favour-glow italic">loved one</span> Today.
-            </h2>
-            <p class="text-xl md:text-3xl text-gray-700 max-w-3xl mx-auto">
-                We specialize in crafting custom, unforgettable gifts and experiences that scream L-O-V-E! Choose your perfect combination of romance.
-            </p>
-            <a href="#services" class="mt-8 inline-block px-10 py-4 glowing-bg text-white text-xl font-bold rounded-full hover:scale-105 transition duration-300 transform">
-                Start Planning Your Surprise
-            </a>
-        </section>
+    <!-- LOCK LP PANE -->
+    <div id="lp-pane-lock" class="lp-pane">
+      <div style="font-size:.72rem;color:var(--dim);margin-bottom:.75rem;line-height:1.65">
+        Lock LP tokens for <b style="color:var(--gld)">2.73× to 5.00× Moat Points</b>. Locked tokens cannot be accessed early without EEL penalty. Burn is disabled for this moat.
+      </div>
+      <div class="lock-grid" style="margin-bottom:.8rem">
+        <div class="lock-opt" data-days="90" onclick="selectLockDur(90,this)"><div class="lock-opt-mult">2.73×</div><div class="lock-opt-days">90 days</div></div>
+        <div class="lock-opt" data-days="180" onclick="selectLockDur(180,this)"><div class="lock-opt-mult">3.23×</div><div class="lock-opt-days">180 days</div></div>
+        <div class="lock-opt" data-days="365" onclick="selectLockDur(365,this)"><div class="lock-opt-mult">4.00×</div><div class="lock-opt-days">365 days</div></div>
+        <div class="lock-opt" data-days="730" onclick="selectLockDur(730,this)"><div class="lock-opt-mult">5.00×</div><div class="lock-opt-days">730 days</div></div>
+      </div>
+      <input type="hidden" id="lockDays" value="180">
+      <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">LP Amount to Lock <span id="lockAvailLp" style="color:var(--dim)"></span></label>
+      <div style="display:flex;gap:5px;margin-bottom:.5rem">
+        <input class="inp" id="lockAmt" type="number" placeholder="0.0" oninput="calcLockPts()" min="0">
+        <button class="btn btn-sm btn-g" onclick="lockMax()">MAX</button>
+      </div>
+      <div id="lockPtsPreview" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--gld);margin-bottom:.75rem;min-height:1.2rem"></div>
+      <button class="btn" style="width:100%;background:var(--gld);color:#141210" onclick="lockLp()">⏳ Lock LP in Moat</button>
+      <div id="lockStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.5rem"></div>
+    </div>
 
-        <!-- 5. SERVICES SECTION -->
-        <section class="py-16 fade-in-up" id="services">
-            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
-                Our Romantic Offerings
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                
-                <!-- Service Card 1 -->
-                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
-                    <i data-lucide="gift" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
-                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Custom Gifts</h4>
-                    <p class="text-gray-700">Gifts chosen by you to match their personality. Perfectly wrapped in love.</p>
+    <!-- UNSTAKE PANE -->
+    <div id="lp-pane-unstake" class="lp-pane">
+      <div style="font-size:.72rem;color:var(--dim);margin-bottom:.75rem;line-height:1.65">
+        Unstake LP tokens from the Moat. A <b style="color:var(--red)">0.5% fee</b> applies on unstake.
+      </div>
+      <div style="background:var(--sur);border:1px solid var(--bor);border-radius:9px;padding:.65rem;margin-bottom:.65rem;font-family:'JetBrains Mono',monospace;font-size:.62rem">
+        LP staked in moat: <span style="color:var(--red)" id="unstakeStakedBal">—</span>
+      </div>
+      <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">Amount to Unstake</label>
+      <div style="display:flex;gap:5px;margin-bottom:.75rem">
+        <input class="inp" id="unstakeAmt" type="number" placeholder="0.0" min="0">
+        <button class="btn btn-sm btn-g" onclick="unstakeMax()">MAX</button>
+      </div>
+      <button class="btn btn-g" style="width:100%;border-color:var(--red);color:var(--red)" onclick="unstakeLp()">↩ Unstake LP from Moat</button>
+      <div id="unstakeStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.5rem"></div>
+    </div>
+
+    <!-- REMOVE LP PANE -->
+    <div id="lp-pane-removelp" class="lp-pane">
+      <div style="font-size:.72rem;color:var(--dim);margin-bottom:.75rem;line-height:1.65">
+        Remove LP tokens from Pharaoh to get back <b style="color:var(--txt)">AVAX + hCASH</b>. Make sure you have unstaked first.
+      </div>
+      <div style="background:var(--sur);border:1px solid var(--bor);border-radius:9px;padding:.65rem;margin-bottom:.65rem;font-family:'JetBrains Mono',monospace;font-size:.62rem">
+        LP in wallet: <span style="color:var(--gld)" id="removeLpWallet">—</span>
+      </div>
+      <div id="removePreview" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);margin-bottom:.6rem;min-height:1.2rem"></div>
+      <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">LP Amount to Remove</label>
+      <div style="display:flex;gap:5px;margin-bottom:.75rem">
+        <input class="inp" id="removeAmt" type="number" placeholder="0.0" min="0" oninput="previewRemove()">
+        <button class="btn btn-sm btn-g" onclick="removeMax()">MAX</button>
+      </div>
+      <button class="btn" style="width:100%;background:var(--gld);color:#141210" onclick="removeLp()">💧 Remove Liquidity from Pharaoh</button>
+      <div id="removeStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.5rem"></div>
+    </div>
+
+    <!-- MY LOCKS PANE -->
+    <div id="lp-pane-locks" class="lp-pane">
+      <div id="myLocksContent"><div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--mut);text-align:center;padding:1.2rem">Loading locks…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SWAP ══ -->
+<div id="view-swap" class="view">
+  <div class="sh">
+    <div class="sh-t">🔀 Swap — AVAX / USDC → hCASH</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--mut)">Slippage</span>
+      <div style="display:flex;gap:3px">
+        <button class="btn btn-sm btn-g" onclick="setSlip(0.5,this)" id="slip05" style="padding:3px 8px;font-size:.55rem">0.5%</button>
+        <button class="btn btn-sm" onclick="setSlip(1.0,this)" id="slip10" style="padding:3px 8px;font-size:.55rem">1.0%</button>
+        <button class="btn btn-sm btn-g" onclick="setSlip(2.0,this)" id="slip20" style="padding:3px 8px;font-size:.55rem">2.0%</button>
+      </div>
+      <input class="inp" id="slipCustom" type="number" style="width:54px;padding:3px 6px;font-size:.58rem" placeholder="%" min="0.1" max="50">
+    </div>
+  </div>
+
+  <div style="max-width:480px;margin:0 auto">
+    <div class="panel">
+      <div class="pb">
+        <!-- FROM -->
+        <div class="swap-box">
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--mut)">From</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim)" id="swapFromBal">Balance: —</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input class="swap-amt" id="swapAmt" type="number" placeholder="0.00" oninput="swapQuote()">
+            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+              <div style="display:flex;gap:4px">
+                <div class="token-chip sel" id="swapBtn_avax" onclick="swapSetToken('avax')">
+                  <img src="https://assets.coingecko.com/coins/images/15075/small/wrapped-avax.png" onerror="this.style.display='none'">AVAX
                 </div>
-
-                <!-- Service Card 2 -->
-                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
-                    <i data-lucide="party-popper" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
-                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Balloons & Decor</h4>
-                    <p class="text-gray-700">Beautiful, vibrant arrangements to set the scene for the perfect moment.</p>
+                <div class="token-chip" id="swapBtn_usdc" onclick="swapSetToken('usdc')">
+                  <img src="https://assets.coingecko.com/coins/images/6319/small/usdc.png" onerror="this.style.display='none'">USDC
                 </div>
-
-                <!-- Service Card 3 -->
-                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
-                    <i data-lucide="teddy-bear" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
-                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Plush Teddy Bears</h4>
-                    <p class="text-gray-700">Cuddly companions that deliver your love when you can't be there.</p>
-                </div>
-
-                <!-- Service Card 4 -->
-                <div class="p-6 bg-white border-4 border-favour-pink rounded-2xl glowing-shadow text-center hover:scale-[1.03] transition duration-300 transform cursor-pointer">
-                    <i data-lucide="candy" class="w-12 h-12 text-favour-glow mx-auto mb-4"></i>
-                    <h4 class="text-2xl font-bold text-favour-pink mb-2">Candy & Treats</h4>
-                    <p class="text-gray-700">Sweeten the surprise with delicious candy and treats. A whole lot more!</p>
-                </div>
-
+              </div>
+              <button onclick="swapMax()" style="background:rgba(224,53,53,.1);border:1px solid rgba(224,53,53,.2);border-radius:5px;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.52rem;padding:2px 8px;cursor:pointer;width:100%">MAX</button>
             </div>
-        </section>
+          </div>
+        </div>
 
-        <!-- 6. BUILD YOUR SURPRISE CONFIGURATOR (Drag & Drop) -->
-        <section class="py-16 fade-in-up" id="configurator">
-            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
-                Build Your Perfect Surprise
-            </h3>
-            <p class="text-center text-lg max-w-2xl mx-auto mb-10 text-gray-700">
-                Drag the items below into the **Gift Box** to define your custom surprise. When you're ready, hit 'Order'!
-            </p>
+        <!-- ARROW -->
+        <div class="swap-arrow" onclick="swapFlip()">⇅</div>
 
-            <div class="flex flex-col lg:flex-row gap-8">
-                <!-- DRAGGABLE OPTIONS PANEL -->
-                <div class="lg:w-1/3 p-6 bg-favour-light rounded-2xl glowing-shadow space-y-4">
-                    <h4 class="text-2xl font-bold text-favour-pink border-b pb-3 border-favour-pink">Drag These Elements:</h4>
-                    
-                    <!-- Draggable Items -->
-                    <div id="item-balloons" data-item="Balloons" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
-                        <span class="text-3xl mr-3">🎈</span>
-                        <span class="text-xl font-medium">Vibrant Balloons</span>
-                    </div>
-                    
-                    <div id="item-teddy" data-item="Plush Teddy Bear" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
-                        <span class="text-3xl mr-3">🧸</span>
-                        <span class="text-xl font-medium">Plush Teddy Bear</span>
-                    </div>
-                    
-                    <div id="item-candy" data-item="Sweet Candy & Treats" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
-                        <span class="text-3xl mr-3">🍬</span>
-                        <span class="text-xl font-medium">Sweet Candy & Treats</span>
-                    </div>
-                    
-                    <div id="item-bouquet" data-item="Luxury Money Bouquet" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
-                        <span class="text-3xl mr-3">💐</span>
-                        <span class="text-xl font-medium">Luxury Money Bouquet</span>
-                    </div>
-
-                    <div id="item-moneybox" data-item="Money Box Surprise" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
-                        <span class="text-3xl mr-3">💵</span>
-                        <span class="text-xl font-medium">Money Box Surprise</span>
-                    </div>
-                    
-                    <div id="item-custom" data-item="Custom Gift Item" class="drag-item flex items-center p-3 rounded-xl bg-white shadow-lg border-2 border-favour-pink hover:glowing-shadow transition" draggable="true">
-                        <span class="text-3xl mr-3">✨</span>
-                        <span class="text-xl font-medium">Custom Gift Item</span>
-                    </div>
-
-                    <button onclick="clearCart()" class="mt-6 w-full py-2 bg-white text-favour-pink font-semibold rounded-full border border-favour-pink hover:bg-favour-light transition">
-                        Clear Cart
-                    </button>
-                </div>
-
-                <!-- VISUALIZATION & DROP ZONE -->
-                <div id="drop-zone" class="lg:w-2/3 p-8 bg-white rounded-2xl glowing-shadow border-4 border-favour-pink flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden transition-all duration-300">
-                    <h4 class="text-3xl font-extrabold text-favour-pink glowing-text mb-6">Your Custom Gift Box Preview</h4>
-                    
-                    <div id="gift-box-base" class="relative w-64 h-32 bg-favour-pink glowing-shadow rounded-xl border-8 border-white flex items-center justify-center transition-all duration-500">
-                        <span class="text-white text-xl font-bold">Drop Items Here!</span>
-                        <div id="gift-box-ribbon" class="absolute inset-0 bg-favour-glow opacity-30"></div>
-                    </div>
-
-                    <!-- Visualization Items (initially hidden) -->
-                    <div id="viz-Balloons" class="viz-item absolute -top-16 right-10 text-6xl">🎈</div>
-                    <div id="viz-Plush-Teddy-Bear" class="viz-item absolute bottom-4 left-4 text-6xl">🧸</div>
-                    <div id="viz-Sweet-Candy-&-Treats" class="viz-item absolute top-1/2 left-4 text-6xl">🍬</div>
-                    <div id="viz-Luxury-Money-Bouquet" class="viz-item absolute top-1/4 right-20 text-6xl">💐</div>
-                    <div id="viz-Money-Box-Surprise" class="viz-item absolute bottom-10 right-10 text-6xl">💵</div>
-                    <div id="viz-Custom-Gift-Item" class="viz-item absolute top-1/4 left-20 text-6xl">✨</div>
-
-                    <button onclick="openWhatsAppCart()" class="mt-8 px-8 py-3 glowing-bg text-white text-xl font-bold rounded-full hover:scale-105 transition duration-300 transform">
-                        Order My Custom Surprise (via WhatsApp)
-                    </button>
-                    <p id="cart-summary" class="mt-3 text-sm text-gray-600 font-semibold"></p>
-                </div>
+        <!-- TO -->
+        <div class="swap-box">
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--mut)">To</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim)" id="swapToBal">Balance: —</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="swap-amt" id="swapOut" style="color:var(--grn);opacity:.7">0.00</div>
+            <div class="token-chip" style="border-color:rgba(224,53,53,.3);background:rgba(224,53,53,.1);color:var(--red)">
+              <img src="https://raw.githubusercontent.com/precidoboss/my-game-sprites/main/hashcashclub.png" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'">hCASH
             </div>
-        </section>
+          </div>
+        </div>
 
+        <!-- QUOTE INFO -->
+        <div id="swapInfo" style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--mut);margin:.6rem 0;min-height:1.2rem;text-align:center"></div>
+        <div id="swapRoute" style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--dim);margin-bottom:.75rem;text-align:center"></div>
 
-        <!-- 7. AUTOMATIC SLIDER GALLERY -->
-        <section class="fade-in-up" id="gallery-section">
-            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
-                A Glimpse of Happiness
-            </h3>
-            
-            <div class="full-screen-slider-track rounded-3xl glowing-shadow bg-favour-light">
-                <!-- Image list starts here -->
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/SJMrvDv.jpeg" alt="Luxury Money Bouquet 1">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/Aza3r6s.jpeg" alt="Luxury Money Bouquet 2">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/kfHAlQ4.jpeg" alt="Luxury Money Bouquet 3">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/Mro65G2.jpeg" alt="Large Pink Teddy Bear">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/bSlXKXD.jpeg" alt="Cute Teddy Bear Arrangement">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/tBW2lJT.jpeg" alt="Gift Box with Balloons 1">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/KvEtW5d.jpeg" alt="Gift Box with Flowers">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/zdCwoKa.jpeg" alt="Gift Box with Custom Items">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/mVZ2pZk.jpeg" alt="Gift Box Arrangement 4">
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/Pyh4cmo.jpeg" alt="Elegant Gift Box">
-                <!-- Duplicate first image to help loop feeling -->
-                <img class="full-screen-slide-item rounded-3xl" src="https://i.imgur.com/SJMrvDv.jpeg" alt="Luxury Money Bouquet (Loop End)">
+        <button class="btn" style="width:100%;font-size:.75rem" onclick="doSwap()" id="swapBtn">🔀 Swap via Pharaoh</button>
+        <div id="swapStatus" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);text-align:center;margin-top:.5rem"></div>
+
+        <div style="background:var(--sur);border:1px solid var(--bor);border-radius:9px;padding:.7rem;margin-top:.85rem">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);margin-bottom:.4rem">ROUTE</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--dim)">Direct on-chain Pharaoh swap · WAVAX/hCASH Volatile Pool</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--mut);margin-top:.3rem">⛽ ~0.006 AVAX estimated gas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MINERS ══ -->
+<div id="view-miners" class="view">
+  <div class="sh">
+    <div class="sh-t">⛏ HashCash Miner NFTs</div>
+    <span class="live"><span class="ld"></span><span style="font-family:'JetBrains Mono',monospace;font-size:.58rem">LIVE</span></span>
+  </div>
+
+  <!-- Miner grid view -->
+  <div id="minerGrid">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem" id="minerCards">
+      <!-- filled by JS -->
+      <div style="padding:2rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut);grid-column:span 2;text-align:center"><span class="spin"></span> Loading miners from HashCash API…</div>
+    </div>
+    <div style="margin-top:.85rem;background:var(--card);border:1px solid var(--bor);border-radius:11px;padding:.85rem">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem">HashCash API Connection</div>
+      <div id="hcApiStatus" style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--dim)">Connecting to api.hashcash.club…</div>
+      <div style="display:flex;gap:6px;margin-top:.55rem;align-items:center">
+        <input class="inp" id="hcApiKey" placeholder="hc_live_… (your API key)" style="flex:1;font-size:.62rem">
+        <button class="btn btn-sm" onclick="loadMiners()">Load</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Miner detail subpage -->
+  <div id="minerDetail" style="display:none">
+    <button class="btn btn-sm btn-g" onclick="backToMiners()" style="margin-bottom:.85rem;display:flex;align-items:center;gap:6px">← Back to Miners</button>
+    <div class="miner-hero" id="minerHero"></div>
+    <div class="g2">
+      <div>
+        <div class="panel">
+          <div class="ph"><div class="ptitle">⛓ On-Chain Details</div><span class="live"><span class="ld"></span></span></div>
+          <div class="pb0 tw"><table class="tbl" id="minerOnChainTbl"><tbody></tbody></table></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptitle">⚡ Miner Stats</div></div>
+          <div id="minerStatsContent" class="pb"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptitle">📊 All Fields</div></div>
+        <div class="pb0 tw"><table class="tbl" id="minerFieldsTbl"><tbody></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LEADERBOARD ══ -->
+<div id="view-leaderboard" class="view">
+  <div class="sh">
+    <div class="sh-t">🏆 hCASH Moat Leaderboard</div>
+    <span class="live"><span class="ld"></span></span>
+  </div>
+  <div class="gsb">
+    <div>
+      <div class="panel">
+        <div class="ph">
+          <div class="ptitle">Moat Points Ranking</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--mut)" id="lbUpdated"></div>
+        </div>
+        <div class="pb0 tw">
+          <table class="tbl" id="lbTable">
+            <thead><tr><th>#</th><th>Wallet</th><th>Points</th><th>Share</th></tr></thead>
+            <tbody id="lbBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="ph"><div class="ptitle">My Position</div></div>
+        <div class="pb" id="lbMyPos">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--mut)">Connect wallet to see your rank</div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:.85rem">
+        <div class="ph"><div class="ptitle">Distribution</div></div>
+        <div class="pb">
+          <div style="display:flex;flex-direction:column;gap:.45rem" id="lbDist"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CALCULATOR ══ -->
+<div id="view-calculator" class="view">
+  <div class="sh"><div class="sh-t">📐 Points & Airdrop Calculator</div></div>
+  <div class="g2">
+    <div class="panel">
+      <div class="ph"><div class="ptitle">Moat Points Estimator</div></div>
+      <div class="pb">
+        <div style="display:flex;flex-direction:column;gap:.65rem">
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem">LP Tokens to Stake/Lock</label>
+            <input class="inp" id="calcLp" type="number" placeholder="e.g. 0.0001" oninput="calcPoints()">
+          </div>
+          <div>
+            <label style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.5rem">Strategy</label>
+            <div class="lock-grid">
+              <div class="lock-opt sel" data-m="stake" onclick="selectCalcMode('stake',this)"><div class="lock-opt-mult" style="color:var(--txt)">1×</div><div class="lock-opt-days">Stake (flex)</div></div>
+              <div class="lock-opt" data-m="lock90" onclick="selectCalcMode('lock90',this)"><div class="lock-opt-mult">2.73×</div><div class="lock-opt-days">Lock 90d</div></div>
+              <div class="lock-opt" data-m="lock365" onclick="selectCalcMode('lock365',this)"><div class="lock-opt-mult">4.00×</div><div class="lock-opt-days">Lock 365d</div></div>
+              <div class="lock-opt" data-m="lock730" onclick="selectCalcMode('lock730',this)"><div class="lock-opt-mult">5.00×</div><div class="lock-opt-days">Lock 730d</div></div>
             </div>
-            <p class="text-center mt-4 text-gray-600 italic">Scroll left and right to view more beautiful arrangements!</p>
-        </section>
-
-
-        <!-- 8. LOCATION & CONTACT -->
-        <section class="py-16 fade-in-up" id="contact">
-            <h3 class="text-4xl md:text-5xl text-center font-bold text-favour-pink glowing-text mb-12">
-                Connect With Us
-            </h3>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-favour-light p-8 md:p-12 rounded-3xl glowing-shadow">
-                
-                <!-- Contact Info -->
-                <div class="space-y-6">
-                    <h4 class="text-3xl font-bold text-favour-pink">Get Started!</h4>
-                    
-                    <!-- WhatsApp/Phone -->
-                    <div class="flex items-center space-x-4">
-                        <i data-lucide="phone" class="w-8 h-8 text-favour-glow"></i>
-                        <div>
-                            <p class="text-lg font-semibold text-gray-800">Call or WhatsApp:</p>
-                            <a href="https://wa.me/2349134158314?text=Hello%20Favours%20Surprises%2C%20I'd%20like%20to%20inquire%20about%20your%20surprise%20packages%20and%20pricing." target="_blank" class="text-2xl font-extrabold text-favour-pink hover:underline">09134158314</a>
-                            <p class="text-sm text-gray-600 mt-1 italic">Send us a DM to start planning!</p>
-                        </div>
-                    </div>
-
-                    <!-- TikTok -->
-                    <div class="flex items-center space-x-4">
-                        <!-- Custom TikTok SVG logo for 'real' look -->
-                        <svg class="w-8 h-8 text-favour-glow" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12.5 12.875c1.455 0 2.625 1.17 2.625 2.625v1.75c0 .35-.285.625-.625.625h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-1.05-.85-1.875-1.875-1.875h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-.35.285-.625.625-.625h1.75zm1.75-6.125h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-1.05-.85-1.875-1.875-1.875h-1.75c-.34 0-.625-.275-.625-.625v-1.75c0-.35.285-.625.625-.625h1.75c1.455 0 2.625 1.17 2.625 2.625v1.75c0 .35.285.625.625.625h1.75c.34 0 .625.275.625.625v1.75c0 .35-.285.625-.625.625h-1.75zm-3.5 10.5h1.75c.34 0 .625.275.625.625v1.75c0 1.05.85 1.875 1.875 1.875h1.75c.34 0 .625.275.625.625v1.75c0 .35-.285.625-.625.625h-1.75c-1.455 0-2.625-1.17-2.625-2.625v-1.75c0-.35.285-.625.625-.625h1.75z"/>
-                        </svg>
-                        <div>
-                            <p class="text-lg font-semibold text-gray-800">Follow us on TikTok:</p>
-                            <a href="https://www.tiktok.com/@favours_surprises" target="_blank" class="text-2xl font-extrabold text-favour-pink hover:underline">@favours_surprises</a>
-                            <p class="text-sm text-gray-600 mt-1 italic">DM us for quick surprise ideas!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Location Info -->
-                <div class="space-y-6 lg:border-l lg:border-favour-pink lg:pl-12">
-                    <h4 class="text-3xl font-bold text-favour-pink">Delivery & Location</h4>
-                    
-                    <!-- Main Location -->
-                    <div>
-                        <p class="text-lg font-semibold text-gray-800 flex items-center mb-1">
-                            <i data-lucide="map-pin" class="w-5 h-5 mr-2 text-favour-glow"></i>
-                            Our Base of Operations:
-                        </p>
-                        <p class="text-xl font-extrabold text-favour-pink">Ajayi Crowther University</p>
-                    </div>
-                    
-                    <!-- Delivery Area -->
-                    <div>
-                        <p class="text-lg font-semibold text-gray-800 flex items-center mb-1">
-                            <i data-lucide="truck" class="w-5 h-5 mr-2 text-favour-glow"></i>
-                            Delivery Zone:
-                        </p>
-                        <p class="text-xl font-extrabold text-favour-pink">Anywhere in Ibadan</p>
-                        <p class="text-sm text-gray-600 mt-1">We bring the surprise right to their doorstep.</p>
-                    </div>
-                </div>
-
+            <input type="hidden" id="calcMode" value="stake">
+          </div>
+          <div id="calcResult" style="background:var(--sur);border:1px solid var(--bor);border-radius:11px;padding:1rem;display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem">
+              <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut);text-transform:uppercase;margin-bottom:.2rem">Est. Points</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em;color:var(--red)" id="calcPts">—</div></div>
+              <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut);text-transform:uppercase;margin-bottom:.2rem">Multiplier</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em;color:var(--gld)" id="calcMult">—</div></div>
+              <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut);text-transform:uppercase;margin-bottom:.2rem">Lock Duration</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em" id="calcDuration">—</div></div>
+              <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut);text-transform:uppercase;margin-bottom:.2rem">Pool Share Est.</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em;color:var(--grn)" id="calcShare">—</div></div>
             </div>
-        </section>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    </main>
+    <div>
+      <div class="panel">
+        <div class="ph"><div class="ptitle">Lock Multiplier Table</div></div>
+        <div class="pb0 tw">
+          <table class="tbl">
+            <thead><tr><th>Duration</th><th>Multiplier</th><th>Points per LP/day</th></tr></thead>
+            <tbody>
+              <tr><td>Stake (flexible)</td><td style="color:var(--txt)">1.00×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">1 × days</td></tr>
+              <tr><td>7 days</td><td style="color:var(--gld)">2.11×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">14.77 per LP</td></tr>
+              <tr><td>30 days</td><td style="color:var(--gld)">2.31×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">69.3 per LP</td></tr>
+              <tr><td>90 days</td><td style="color:var(--gld)">2.73×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">245.7 per LP</td></tr>
+              <tr><td>180 days</td><td style="color:var(--gld)">3.23×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">581.4 per LP</td></tr>
+              <tr><td>365 days</td><td style="color:var(--red)">4.00×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">1,460 per LP</td></tr>
+              <tr><td>540 days</td><td style="color:var(--red)">4.57×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim)">2,467.8 per LP</td></tr>
+              <tr><td>730 days</td><td style="color:var(--red);font-weight:700">5.00×</td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--red)">3,650 per LP</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-    <footer class="p-6 text-center mt-12 border-t border-favour-light">
-        <p class="text-sm text-gray-500">&copy; 2024 Favours Surprises. All rights reserved. Made with love.</p>
-    </footer>
+      <!-- EEL Calculator -->
+      <div class="panel" style="margin-top:.85rem">
+        <div class="ph"><div class="ptitle">⚠️ Early Exit Penalty (EEL)</div></div>
+        <div class="pb">
+          <div style="font-size:.7rem;color:var(--dim);margin-bottom:.75rem;line-height:1.6">Calculate the penalty if you exit a lock early. 95% of penalty burned, 5% as protocol fee.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem">
+            <div>
+              <label style="font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut);display:block;margin-bottom:.3rem">LP Locked</label>
+              <input class="inp" id="eelAmt" type="number" placeholder="LP amount" oninput="calcEEL()">
+            </div>
+            <div>
+              <label style="font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut);display:block;margin-bottom:.3rem">Total Lock Days</label>
+              <input class="inp" id="eelTotalDays" type="number" placeholder="e.g. 365" max="730" oninput="calcEEL()">
+            </div>
+            <div>
+              <label style="font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--mut);display:block;margin-bottom:.3rem">Days Elapsed</label>
+              <input class="inp" id="eelElapsed" type="number" placeholder="days passed" oninput="calcEEL()">
+            </div>
+          </div>
+          <div id="eelResult" style="display:none;background:rgba(224,53,53,.07);border:1px solid rgba(224,53,53,.2);border-radius:9px;padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.65rem">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
+              <div>Penalty %:<span style="color:var(--red);margin-left:6px" id="eelPenPct">—</span></div>
+              <div>You receive:<span style="color:var(--grn);margin-left:6px" id="eelReceive">—</span></div>
+              <div>Burned (95%):<span style="color:var(--dim);margin-left:6px" id="eelBurned">—</span></div>
+              <div>Protocol fee:<span style="color:var(--mut);margin-left:6px" id="eelFee">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+</main>
 
-        // --- GLOBAL STATE ---
-        const IMAGE_URLS = [
-            "https://i.imgur.com/SJMrvDv.jpeg", "https://i.imgur.com/Aza3r6s.jpeg", "https://i.imgur.com/kfHAlQ4.jpeg", 
-            "https://i.imgur.com/Mro65G2.jpeg", "https://i.imgur.com/bSlXKXD.jpeg",  
-            "https://i.imgur.com/KvEtW5d.jpeg", "https://i.imgur.com/zdCwoKa.jpeg", "https://i.imgur.com/mVZ2pZk.jpeg", 
-            "https://i.imgur.com/3FNndV.jpeg"
-        ];
-        
-        let selectedItems = new Set(); 
+<!-- ── NOTIFICATION ── -->
+<div class="notif" id="notif"></div>
 
+<!-- ── FOOTER ── -->
+<div class="foot">
+  <div style="display:inline-flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bor);border-radius:99px;padding:.55rem 1.3rem">
+    <img src="https://raw.githubusercontent.com/precidoboss/my-game-sprites/main/hashcashclub.png" style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid rgba(224,53,53,.3)" onerror="this.style.display='none'">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--mut)">hCASH × MOATS LP App</span>
+    <span style="width:1px;height:14px;background:var(--bor)"></span>
+    <a href="https://moats.app/moat/0x501f6e7bec3db63d8dacbc9fa0ce42d5d2329d53" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--red);text-decoration:none">View on Moats ↗</a>
+    <a href="https://www.phar.gg/liquidity" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--gld);text-decoration:none">Pharaoh ↗</a>
+  </div>
+  <div style="margin-top:.6rem;font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">Not financial advice · Built on Avalanche · Moats data from moat-api.fortifi.network</div>
+</div>
 
-        // --- 1. INTRO MODAL LOGIC ---
-        function closeModal() {
-            const modal = document.getElementById('intro-modal');
-            modal.style.transform = 'scale(1.1)';
-            modal.style.opacity = '0';
+<!-- ══ SCRIPT ══ -->
+<script>
+// ── CONSTANTS ──
+const AVAX_RPC = 'https://api.avax.network/ext/bc/C/rpc';
+const AVAX_RPC_LIST = ['https://api.avax.network/ext/bc/C/rpc','https://avalanche-c-chain-rpc.publicnode.com','https://rpc.ankr.com/avalanche'];
+const MOATS_API = 'https://moat-api.fortifi.network/api';
+const HCASH_MOAT_ADDR = '0x501f6e7bec3db63d8dacbc9fa0ce42d5d2329d53';
+const HC_API = 'https://api.hashcash.club/api/v1/public';
+const DEAD_ADDR = '0x000000000000000000000000000000000000dEaD';
 
-            setTimeout(() => {
-                modal.remove();
-                startImageSlider();
-                observeElements();
-            }, 500);
+let WAVAX_ADDR, USDC_ADDR, HCASH_LP_ADDR, PHARAOH_ROUTER_ADDR, PHARAOH_FACTORY_ADDR;
+let HCASH_TOKEN_ADDR = null;
+
+function initAddrs() {
+  WAVAX_ADDR           = ethers.getAddress('0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7');
+  USDC_ADDR            = ethers.getAddress('0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e');
+  HCASH_LP_ADDR        = ethers.getAddress('0x8f961980518bc9ab302948de7948580666dc35d9');
+  PHARAOH_ROUTER_ADDR  = ethers.getAddress('0x9cee04bdce127da7e448a333f006defb3d5e38cc');
+  PHARAOH_FACTORY_ADDR = ethers.getAddress('0x85448bf2f589ab1f56225df5167c63f57758f8c1');
+}
+
+const ERC20_ABI = [
+  'function approve(address,uint256) returns (bool)',
+  'function allowance(address,address) view returns (uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function symbol() view returns (string)',
+  'function name() view returns (string)',
+  'function totalSupply() view returns (uint256)',
+  'function transfer(address,uint256) returns (bool)',
+];
+const LP_ABI = [...ERC20_ABI,
+  'function getReserves() view returns (uint256,uint256,uint256)',
+  'function token0() view returns (address)',
+  'function token1() view returns (address)',
+];
+const MOAT_ABI = [
+  'function stake(uint256)',
+  'function lock(uint256,uint256)',
+  'function unstake(uint256)',
+  'function earlyExitLock(uint256)',
+  'function exitLock(uint256)',
+  'function claimAllRewards()',
+  'function getCurrentPoints(address) view returns (uint256)',
+  'function userInfo(address) view returns (uint256,uint256,uint256,uint256,uint256)',
+  'function getAllPendingRewards(address) view returns (address[],uint256[])',
+  'function getUserAllLocks(address) view returns (uint256[],uint256[],uint256[],uint256[],uint256[],bool[])',
+  'function balanceOf(address) view returns (uint256)',
+];
+const PHARAOH_ROUTER_ABI = [
+  'function quoteAddLiquidity(address,address,bool,uint256,uint256) view returns (uint256,uint256,uint256)',
+  'function quoteRemoveLiquidity(address,address,bool,uint256) view returns (uint256,uint256)',
+  'function addLiquidityAVAX(address,bool,uint256,uint256,uint256,address,uint256) payable returns (uint256,uint256,uint256)',
+  'function removeLiquidityAVAX(address,bool,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)',
+  'function addLiquidity(address,address,bool,uint256,uint256,uint256,uint256,address,uint256) returns (uint256,uint256,uint256)',
+  'function getAmountsOut(uint256,tuple(address from,address to,bool stable)[]) view returns (uint256[])',
+  'function swapExactAVAXForTokens(uint256,tuple(address from,address to,bool stable)[],address,uint256) payable returns (uint256[])',
+  'function swapExactTokensForAVAX(uint256,uint256,tuple(address from,address to,bool stable)[],address,uint256) returns (uint256[])',
+  'function swapExactTokensForTokens(uint256,uint256,tuple(address from,address to,bool stable)[],address,uint256) returns (uint256[])',
+];
+const WAVAX_ABI = [
+  'function deposit() payable',
+  'function withdraw(uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'function approve(address,uint256) returns (bool)',
+  'function allowance(address,address) view returns (uint256)',
+];
+
+// ── STATE ──
+let provider = null, signer = null, userAddr = null;
+let slippage = 1.0;
+let swapToken = 'avax';
+let lpData = { lpBal:0, stakedBal:0, myPts:0, avaxBal:0, hcashBal:0, locks:[] };
+let moatPoints = [];
+let allEvents = [];
+let minersList = [];
+let activeMiner = null;
+let lbData = [];
+let hcashPrice = 0;
+let lockCalcMode = 'stake';
+let calcMode = 'stake';
+
+// ── HELPERS ──
+function fmtN(n, dec=4) {
+  if (!n || isNaN(n)) return '—';
+  if (n >= 1e9) return (n/1e9).toFixed(2)+'B';
+  if (n >= 1e6) return (n/1e6).toFixed(2)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'K';
+  return parseFloat(n).toFixed(dec);
+}
+function fmtP(n) { return fmtN(n, 0); }
+function shortAddr(a) { return a ? a.slice(0,6)+'…'+a.slice(-4) : '—'; }
+function lockMultiplier(days) {
+  if (days>=730) return 5.0;
+  if (days>=540) return 4.57;
+  if (days>=365) return 4.0;
+  if (days>=180) return 3.23;
+  if (days>=90)  return 2.73;
+  if (days>=30)  return 2.31;
+  if (days>=7)   return 2.11;
+  return 2.04;
+}
+function showNotif(msg, type='info') {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = `notif ${type} show`;
+  setTimeout(()=>el.classList.remove('show'), 4500);
+}
+async function getProvider() {
+  for (const rpc of AVAX_RPC_LIST) {
+    try { const p=new ethers.JsonRpcProvider(rpc); await p.getBlockNumber(); return p; } catch(e){}
+  }
+  return new ethers.JsonRpcProvider(AVAX_RPC);
+}
+async function resolveHcashToken() {
+  if (HCASH_TOKEN_ADDR) return HCASH_TOKEN_ADDR;
+  const prov = signer ? await signer.provider : await getProvider();
+  const lp = new ethers.Contract(HCASH_LP_ADDR, ['function token0() view returns (address)','function token1() view returns (address)'], prov);
+  const [t0,t1] = await Promise.all([lp.token0(), lp.token1()]);
+  HCASH_TOKEN_ADDR = ethers.getAddress(t0.toLowerCase()===WAVAX_ADDR.toLowerCase()?t1:t0);
+  return HCASH_TOKEN_ADDR;
+}
+
+// ── NAV ──
+function nav(el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  el.classList.add('on');
+  const v = el.dataset.v;
+  document.getElementById('view-'+v).classList.add('on');
+  if (v==='miners') loadMiners();
+  if (v==='leaderboard') renderLeaderboard();
+  if (v==='lp') { refreshLpBanners(); loadMyBalances(); loadMyLocks(); }
+  if (v==='swap') loadSwapBals();
+}
+
+// ── LP TABS ──
+function lpTab(el) {
+  document.querySelectorAll('.lp-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.lp-pane').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('lp-pane-'+el.dataset.p).classList.add('on');
+  if (el.dataset.p==='locks') renderMyLocks();
+  if (el.dataset.p==='removelp') loadRemoveBals();
+  if (el.dataset.p==='unstake') { const el2=document.getElementById('unstakeStakedBal'); if(el2) el2.textContent = fmtN(lpData.stakedBal)+' LP'; }
+  if (el.dataset.p==='addlp') loadLpBals();
+}
+
+// ── WALLET ──
+async function connectWallet() {
+  if (!window.ethereum) { showNotif('No wallet found — install MetaMask or Core', 'err'); return; }
+  try {
+    const prov = new ethers.BrowserProvider(window.ethereum);
+    await prov.send('eth_requestAccounts',[]);
+    const net = await prov.getNetwork();
+    if (Number(net.chainId)!==43114) {
+      try { await prov.send('wallet_switchEthereumChain',[{chainId:'0xa86a'}]); } catch(e){}
+    }
+    signer = await prov.getSigner();
+    provider = prov;
+    userAddr = await signer.getAddress();
+    updateWalletUI();
+    loadMyBalances();
+    showNotif('Wallet connected: '+shortAddr(userAddr), 'ok');
+  } catch(e) { showNotif('Connection failed: '+e.message, 'err'); }
+}
+function updateWalletUI() {
+  const badge = document.getElementById('walletBadge');
+  const label = document.getElementById('walletLabel');
+  if (userAddr) {
+    badge.innerHTML = `<span class="wallet-dot"></span><span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--txt)">${shortAddr(userAddr)}</span>`;
+    badge.onclick = null;
+    document.getElementById('lpConnectedAddr').textContent = userAddr;
+  }
+  refreshLpBanners();
+}
+function refreshLpBanners() {
+  const banner = document.getElementById('lpWalletBanner');
+  const summary = document.getElementById('lpPositionSummary');
+  if (userAddr) {
+    if(banner) banner.style.display='none';
+    if(summary) summary.style.display='block';
+  } else {
+    if(banner) banner.style.display='block';
+    if(summary) summary.style.display='none';
+  }
+}
+
+// ── LOAD ALL DATA ──
+async function loadAll() {
+  try {
+    initAddrs();
+    loadOverviewData();
+    loadMoatPoints();
+    loadEvents();
+  } catch(e) { console.warn('loadAll error', e); }
+}
+
+// ── OVERVIEW DATA ──
+async function loadOverviewData() {
+  // Fetch LP reserves
+  try {
+    const prov = await getProvider();
+    const lp = new ethers.Contract(HCASH_LP_ADDR, LP_ABI, prov);
+    const [res, t0, ts, moatBal] = await Promise.all([
+      lp.getReserves(), lp.token0(), lp.totalSupply(), lp.balanceOf(HCASH_MOAT_ADDR)
+    ]);
+    const isWavaxT0 = t0.toLowerCase()===WAVAX_ADDR.toLowerCase();
+    const wavaxRes  = parseFloat(ethers.formatEther(isWavaxT0?res[0]:res[1]));
+    const hcashRes  = parseFloat(ethers.formatUnits(isWavaxT0?res[1]:res[0], 18));
+    const totalLp   = parseFloat(ethers.formatEther(ts));
+    const moatLp    = parseFloat(ethers.formatEther(moatBal));
+    const pct       = totalLp>0 ? (moatLp/totalLp*100).toFixed(1) : 0;
+    setText('lpReserveWavax', fmtN(wavaxRes,2)+' WAVAX');
+    setText('lpReserveHcash', fmtN(hcashRes,0)+' hCASH');
+    setText('lpTotalSupply', fmtN(totalLp,4)+' LP');
+    setText('lpStakedInMoat', fmtN(moatLp,4)+' LP');
+    setText('lpMoatPct', pct+'%');
+    setText('lpRate', fmtN(hcashRes/wavaxRes,0)+' hCASH');
+    const fill = document.getElementById('lpProgFill');
+    if (fill) fill.style.width = Math.min(pct,100)+'%';
+    setText('lpProgLabel', pct+'%');
+    // hCASH price from ratio (AVAX price approx)
+    document.getElementById('liveTs').style.display='block';
+    document.getElementById('ovLive').style.display='flex';
+  } catch(e) { console.warn('LP data fetch:', e.message); }
+
+  // Fetch hCASH price from DexScreener
+  try {
+    const r = await fetch('https://api.dexscreener.com/latest/dex/pairs/avalanche/0x8f961980518bc9ab302948de7948580666dc35d9');
+    const d = await r.json();
+    const pair = d?.pairs?.[0] || d?.pair;
+    if (pair?.priceUsd) {
+      hcashPrice = parseFloat(pair.priceUsd);
+      setText('ovPrice', '$'+fmtN(hcashPrice,6));
+      const ch = parseFloat(pair.priceChange?.h24||0);
+      const chEl = document.getElementById('ovPriceCh');
+      if (chEl) { chEl.textContent = (ch>=0?'+':'')+ch.toFixed(2)+'% (24h)'; chEl.className = 'ss '+(ch>=0?'up':'dn'); }
+    }
+  } catch(e) {}
+}
+
+// ── MOAT POINTS ──
+async function loadMoatPoints() {
+  try {
+    const r = await fetch(`${MOATS_API}/moat-points/all?contractAddress=${HCASH_MOAT_ADDR}`);
+    const data = await r.json();
+    if (Array.isArray(data)) {
+      moatPoints = data.map(p=>({...p, points:Number(p.points||p.point||p.moatPoints||0)}))
+                       .sort((a,b)=>b.points-a.points);
+      const totalPts = moatPoints.reduce((s,p)=>s+p.points,0);
+      setText('ovWallets', moatPoints.length+'');
+      setText('ovPoints', fmtP(totalPts));
+      if (moatPoints[0]) {
+        setText('ovTopPts', fmtP(moatPoints[0].points));
+        const topEl = document.getElementById('ovTopWallet');
+        if (topEl) topEl.textContent = shortAddr(moatPoints[0].walletAddress);
+      }
+      lbData = moatPoints;
+      renderLeaderboard();
+      if (userAddr) updateMyRank();
+    }
+  } catch(e) { console.warn('moat points:', e.message); }
+}
+
+// ── EVENTS ──
+async function loadEvents() {
+  try {
+    const r = await fetch(`${MOATS_API}/events`);
+    const data = await r.json();
+    if (Array.isArray(data)) {
+      // Filter to hCASH moat
+      allEvents = data.filter(e=>(e.contractAddress||'').toLowerCase()===HCASH_MOAT_ADDR.toLowerCase())
+                      .sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+      setText('ovEvents', allEvents.filter(e=>Date.now()/1000-(e.timestamp||0)<86400).length+'');
+      renderEvents();
+    }
+  } catch(e) { console.warn('events:', e.message); }
+}
+function renderEvents() {
+  const fd = document.getElementById('ovEvFd');
+  if (!fd) return;
+  if (!allEvents.length) { fd.innerHTML='<div style="padding:.8rem;font-family:\'JetBrains Mono\',monospace;font-size:.6rem;color:var(--mut)">No events yet</div>'; return; }
+  const typeColors = {staked:'var(--grn)',locked:'var(--gld)',burned:'var(--red)',unstake:'var(--dim)',reward:'var(--gld)',unlock:'var(--dim)'};
+  fd.innerHTML = allEvents.slice(0,50).map(e=>{
+    const t = e.eventType||e.type||'event';
+    const c = typeColors[t.toLowerCase()] || 'var(--mut)';
+    const ts = e.timestamp ? new Date(e.timestamp*1000).toLocaleTimeString() : '';
+    const wallet = e.walletAddress || e.wallet || '';
+    return `<div class="ei">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:${c};min-width:54px;flex-shrink:0;font-weight:700;text-transform:uppercase">${t}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--dim);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${shortAddr(wallet)}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--mut);flex-shrink:0">${ts}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── MY BALANCES ──
+async function loadMyBalances() {
+  if (!userAddr || !signer) return;
+  try {
+    const prov = signer.provider;
+    const hcashAddr = await resolveHcashToken();
+    const lp    = new ethers.Contract(HCASH_LP_ADDR, LP_ABI, prov);
+    const moat  = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, prov);
+    const hcash = new ethers.Contract(hcashAddr, ERC20_ABI, prov);
+
+    const [avaxBal, hcashBal, hcashDec, lpBal, ui, pts, rewards] = await Promise.allSettled([
+      prov.getBalance(userAddr),
+      hcash.balanceOf(userAddr),
+      hcash.decimals(),
+      lp.balanceOf(userAddr),
+      moat.userInfo(userAddr),
+      moat.getCurrentPoints(userAddr),
+      moat.getAllPendingRewards(userAddr),
+    ]);
+
+    const avax   = avaxBal.status==='fulfilled' ? parseFloat(ethers.formatEther(avaxBal.value)) : 0;
+    const hcDec  = hcashDec.status==='fulfilled' ? Number(hcashDec.value) : 18;
+    const hc     = hcashBal.status==='fulfilled' ? parseFloat(ethers.formatUnits(hcashBal.value, hcDec)) : 0;
+    const lpB    = lpBal.status==='fulfilled' ? parseFloat(ethers.formatEther(lpBal.value)) : 0;
+    const staked = ui.status==='fulfilled' ? parseFloat(ethers.formatEther(ui.value[0])) : 0;
+    const myPts  = pts.status==='fulfilled' ? parseFloat(ethers.formatUnits(pts.value, 18)) : 0;
+
+    lpData = { lpBal:lpB, stakedBal:staked, myPts, avaxBal:avax, hcashBal:hc, locks:[] };
+
+    setText('myAvax', fmtN(avax,4));
+    setText('myHcash', fmtN(hc,0));
+    setText('myLpWallet', fmtN(lpB,6)+' LP');
+    setText('myLpStaked', fmtN(staked,6)+' LP');
+    setText('myMoatPts', fmtP(myPts));
+    setText('stakeAvailLp', 'wallet: '+fmtN(lpB,6)+' LP');
+    setText('lockAvailLp', 'wallet: '+fmtN(lpB,6)+' LP');
+    setText('unstakeStakedBal', fmtN(staked,6)+' LP');
+    setText('lpAvaxBal', '('+fmtN(avax,4)+' AVAX)');
+    setText('lpHcashBal', '('+fmtN(hc,0)+' hCASH)');
+    setText('removeLpWallet', fmtN(lpB,6)+' LP');
+
+    // Fort score — sum of all moat points (use hCASH as proxy for now)
+    const fortPts = lbData.find(p=>(p.walletAddress||'').toLowerCase()===userAddr.toLowerCase());
+    const fs = fortPts ? fortPts.points : myPts;
+    setText('myFortScore', fmtP(fs));
+
+    // Rewards
+    if (rewards.status==='fulfilled') {
+      const [tokens, amounts] = rewards.value;
+      if (tokens.length > 0) {
+        const panel = document.getElementById('lpRewardsPanel');
+        const content = document.getElementById('lpRewardsContent');
+        if (panel) panel.style.display='block';
+        if (content) {
+          content.innerHTML = tokens.map((t,i)=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--bor)">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut)">${shortAddr(t)}</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.04em;color:var(--grn)">${fmtN(parseFloat(ethers.formatEther(amounts[i])),4)}</span>
+            </div>`).join('');
         }
-        
-        // --- 2. IMAGE SLIDER (Carousel Scroll) LOGIC ---
-        let scrollInterval;
-        const slider = document.querySelector('.full-screen-slider-track');
-        const SLIDE_DURATION = 4000; 
+      }
+    }
+  } catch(e) { console.warn('balances:', e.message); }
+  updateMyRank();
+}
+function updateMyRank() {
+  const el = document.getElementById('lbMyPos');
+  if (!el || !userAddr) return;
+  const idx = lbData.findIndex(p=>(p.walletAddress||'').toLowerCase()===userAddr.toLowerCase());
+  const myEntry = lbData[idx];
+  const totalPts = lbData.reduce((s,p)=>s+p.points,0);
+  if (myEntry) {
+    const share = totalPts>0?(myEntry.points/totalPts*100).toFixed(2):'0.00';
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">RANK</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.04em;color:var(--red)">#${idx+1}</div></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">POINTS</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.04em;color:var(--gld)">${fmtP(myEntry.points)}</div></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">POOL SHARE</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.04em;color:var(--grn)">${share}%</div></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--mut)">AIRDROP WEIGHT</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.04em">${share}%</div></div>
+      </div>`;
+  } else {
+    el.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:.62rem;color:var(--mut)">Not found in this moat</div>';
+  }
+}
+async function loadLpBals() {
+  if (!userAddr || !signer) return;
+  try {
+    const prov = signer.provider;
+    const avax = await prov.getBalance(userAddr);
+    const hcashAddr = await resolveHcashToken();
+    const hcashTok = new ethers.Contract(hcashAddr, ERC20_ABI, prov);
+    const [hb,hd] = await Promise.all([hcashTok.balanceOf(userAddr), hcashTok.decimals().catch(()=>18n)]);
+    const avaxFmt = parseFloat(ethers.formatEther(avax)).toFixed(4);
+    const hcashFmt = parseFloat(ethers.formatUnits(hb, Number(hd))).toFixed(4);
+    setText('lpAvaxBal', '('+avaxFmt+' AVAX)');
+    setText('lpHcashBal', '('+hcashFmt+' hCASH)');
+    lpData.avaxBal = parseFloat(avaxFmt);
+    lpData.hcashBal = parseFloat(hcashFmt);
+  } catch(e) {}
+}
 
-        function autoScroll() {
-            if (!slider) return;
-            
-            const maxScroll = slider.scrollWidth - slider.clientWidth;
-            const scrollStep = window.innerWidth * 0.95; // Same as item width + margin
+// ── LP QUOTE ──
+async function lpQuote() {
+  const avax = parseFloat(document.getElementById('lpAvaxAmt')?.value)||0;
+  const prev = document.getElementById('lpAddPreview');
+  const hcashInp = document.getElementById('lpHcashAmt');
+  const rateEl = document.getElementById('lpRate');
+  if (!avax || avax<=0) { if(prev) prev.textContent=''; if(hcashInp) hcashInp.value=''; return; }
+  if (prev) prev.innerHTML = '<span class="spin"></span> Quoting from Pharaoh…';
+  try {
+    const prov = await getProvider();
+    initAddrs();
+    const hcashAddr = await resolveHcashToken();
+    const hcashTok  = new ethers.Contract(hcashAddr, ERC20_ABI, prov);
+    const hcDec = Number(await hcashTok.decimals().catch(()=>18));
+    const avaxWei = ethers.parseEther(avax.toFixed(6));
+    const router  = new ethers.Contract(PHARAOH_ROUTER_ADDR, PHARAOH_ROUTER_ABI, prov);
+    const bigDes  = ethers.parseUnits('9999999999', hcDec);
+    try {
+      const q = await router.quoteAddLiquidity(WAVAX_ADDR, hcashAddr, false, avaxWei, bigDes);
+      const hcashNeeded = parseFloat(ethers.formatUnits(q[1], hcDec));
+      const lpExp = parseFloat(ethers.formatEther(q[2]));
+      if (hcashInp) hcashInp.value = hcashNeeded.toFixed(Math.min(hcDec,6));
+      if (prev) prev.innerHTML = `<span style="color:var(--grn)">✓</span> ~${lpExp.toFixed(8)} LP · ${hcashNeeded.toFixed(4)} hCASH needed · 1 AVAX = ${(hcashNeeded/avax).toFixed(0)} hCASH`;
+      if (rateEl) rateEl.textContent = (hcashNeeded/avax).toFixed(0)+' hCASH';
+    } catch(e) {
+      // Fallback: reserve math
+      const lp = new ethers.Contract(HCASH_LP_ADDR, LP_ABI, prov);
+      const [res,t0,ts] = await Promise.all([lp.getReserves(), lp.token0(), lp.totalSupply()]);
+      const isW0 = t0.toLowerCase()===WAVAX_ADDR.toLowerCase();
+      const wRes = isW0?res[0]:res[1], hRes = isW0?res[1]:res[0];
+      const hcashWei = avaxWei * hRes / wRes;
+      const hcashNeeded = parseFloat(ethers.formatUnits(hcashWei, hcDec));
+      const lpSh = Number(avaxWei)/Number(wRes);
+      const lpExp = lpSh*Number(ts)/1e18;
+      if (hcashInp) hcashInp.value = hcashNeeded.toFixed(Math.min(hcDec,6));
+      if (prev) prev.innerHTML = `<span style="color:var(--gld)">~</span> ${lpExp.toFixed(8)} LP · ${hcashNeeded.toFixed(4)} hCASH (reserve estimate)`;
+      if (rateEl) rateEl.textContent = (hcashNeeded/avax).toFixed(0)+' hCASH';
+    }
+  } catch(e) { if(prev) prev.innerHTML=`<span style="color:var(--red)">Error: ${e.message.slice(0,60)}</span>`; }
+}
+async function lpMaxAvax() {
+  if (!userAddr||!signer) return;
+  const b = await signer.provider.getBalance(userAddr);
+  const max = Math.max(0, parseFloat(ethers.formatEther(b))-0.05);
+  const inp = document.getElementById('lpAvaxAmt');
+  if (inp) { inp.value = max.toFixed(4); lpQuote(); }
+}
 
-            // If we are at the end (or near the end of the real images), jump back to the start
-            if (slider.scrollLeft >= maxScroll - (scrollStep * 1.5)) {
-                slider.scrollLeft = 0;
-            } else {
-                // Scroll one step to the right
-                slider.scrollBy({ left: scrollStep, behavior: 'smooth' });
-            }
-        }
+// ── ADD LIQUIDITY ──
+async function lpAdd() {
+  const avax = parseFloat(document.getElementById('lpAvaxAmt')?.value)||0;
+  const hcashNeededStr = document.getElementById('lpHcashAmt')?.value;
+  const hcashNeeded = parseFloat(hcashNeededStr||0);
+  const statusEl = document.getElementById('lpAddStatus');
+  if (!avax||!hcashNeeded) { if(statusEl) statusEl.textContent='Enter AVAX amount first'; return; }
+  if (!signer||!userAddr) { if(statusEl) statusEl.textContent='Connect wallet first'; return; }
+  setStatus('lpAddStatus','<span class="spin"></span> Resolving token…');
+  try {
+    initAddrs();
+    const hcashAddr = await resolveHcashToken();
+    const hcashTok  = new ethers.Contract(hcashAddr, ERC20_ABI, signer);
+    const hcDec     = Number(await hcashTok.decimals().catch(()=>18));
+    const avaxWei   = ethers.parseEther(avax.toFixed(6));
+    const hcashWei  = ethers.parseUnits(hcashNeeded.toFixed(Math.min(hcDec,6)), hcDec);
+    const slipMul   = BigInt(Math.floor((1-slippage/100)*10000));
+    const minH      = hcashWei * slipMul / 10000n;
+    const minA      = avaxWei * slipMul / 10000n;
+    const deadline  = BigInt(Math.floor(Date.now()/1000)+1800);
+    const router    = new ethers.Contract(PHARAOH_ROUTER_ADDR, PHARAOH_ROUTER_ABI, signer);
+    // Check hCASH allowance
+    const allowed = await hcashTok.allowance(userAddr, PHARAOH_ROUTER_ADDR);
+    if (allowed < hcashWei) {
+      setStatus('lpAddStatus','<span class="spin"></span> Approving hCASH…');
+      const a = await hcashTok.approve(PHARAOH_ROUTER_ADDR, ethers.MaxUint256);
+      await a.wait();
+    }
+    setStatus('lpAddStatus','<span class="spin"></span> Adding liquidity… confirm in wallet');
+    const tx = await router.addLiquidityAVAX(hcashAddr, false, hcashWei, minH, minA, userAddr, deadline, {value:avaxWei, gasLimit:400000n});
+    setStatus('lpAddStatus','<span class="spin"></span> Waiting for tx…');
+    const rc = await tx.wait();
+    setStatus('lpAddStatus',`<span style="color:var(--grn)">✅ LP added! TX: <a href="https://snowtrace.io/tx/${rc.hash}" target="_blank" style="color:var(--grn)">${rc.hash.slice(0,12)}…</a></span>`);
+    showNotif('LP added successfully!', 'ok');
+    setTimeout(()=>loadMyBalances(), 3000);
+  } catch(e) { setStatus('lpAddStatus','<span style="color:var(--red)">❌ '+fmtErr(e)+'</span>'); }
+}
 
-        function startImageSlider() {
-             if (slider) {
-                // Wait for images to load before starting scroll
-                scrollInterval = setInterval(autoScroll, SLIDE_DURATION);
-             }
-        }
-        
-        // --- 3. SCROLL ANIMATION (Intersection Observer) LOGIC ---
-        const observerOptions = {
-            root: null, 
-            rootMargin: '0px',
-            threshold: 0.1 
-        };
+// ── STAKE LP ──
+function calcStakePts() {
+  const amt = parseFloat(document.getElementById('stakeAmt')?.value)||0;
+  const el = document.getElementById('stakePtsPreview');
+  if (!el||!amt) { if(el) el.textContent=''; return; }
+  el.textContent = `~${fmtP(amt * 1)} Moat Points (1× stake)`;
+}
+function stakeMax() {
+  const inp = document.getElementById('stakeAmt');
+  if (inp) { inp.value = lpData.lpBal.toFixed(8); calcStakePts(); }
+}
+async function stakeLp() {
+  const amt = parseFloat(document.getElementById('stakeAmt')?.value)||0;
+  const statusEl = document.getElementById('stakeStatus');
+  if (!amt) { if(statusEl) statusEl.textContent='Enter amount'; return; }
+  if (!signer||!userAddr) { if(statusEl) statusEl.textContent='Connect wallet'; return; }
+  initAddrs();
+  await runTx('stakeStatus', async () => {
+    const lp   = new ethers.Contract(HCASH_LP_ADDR, ERC20_ABI, signer);
+    const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer);
+    const wei  = ethers.parseEther(amt.toFixed(18));
+    const all  = await lp.allowance(userAddr, HCASH_MOAT_ADDR);
+    if (all < wei) {
+      setStatus('stakeStatus','<span class="spin"></span> Approving LP…');
+      const a = await lp.approve(HCASH_MOAT_ADDR, ethers.MaxUint256); await a.wait();
+    }
+    setStatus('stakeStatus','<span class="spin"></span> Staking… confirm in wallet');
+    return await moat.stake(wei, {gasLimit:250000n});
+  }, `✅ Staked ${fmtN(amt,4)} LP!`);
+}
 
-        function handleIntersect(entries, observer) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate');
-                    observer.unobserve(entry.target); 
-                }
-            });
-        }
+// ── LOCK LP ──
+function selectLockDur(days, el) {
+  document.getElementById('lockDays').value = days;
+  document.querySelectorAll('.lock-opt').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  calcLockPts();
+}
+function calcLockPts() {
+  const amt = parseFloat(document.getElementById('lockAmt')?.value)||0;
+  const days = parseInt(document.getElementById('lockDays')?.value)||180;
+  const el = document.getElementById('lockPtsPreview');
+  if (!el||!amt) { if(el) el.textContent=''; return; }
+  const mult = lockMultiplier(days);
+  el.textContent = `~${fmtP(amt*mult*days)} Moat Points (${mult}× for ${days}d)`;
+}
+function lockMax() {
+  const inp = document.getElementById('lockAmt');
+  if (inp) { inp.value = lpData.lpBal.toFixed(8); calcLockPts(); }
+}
+async function lockLp() {
+  const amt = parseFloat(document.getElementById('lockAmt')?.value)||0;
+  const days = parseInt(document.getElementById('lockDays')?.value)||180;
+  if (!amt) { setStatus('lockStatus','Enter amount'); return; }
+  if (!signer||!userAddr) { setStatus('lockStatus','Connect wallet'); return; }
+  initAddrs();
+  await runTx('lockStatus', async () => {
+    const lp   = new ethers.Contract(HCASH_LP_ADDR, ERC20_ABI, signer);
+    const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer);
+    const wei  = ethers.parseEther(amt.toFixed(18));
+    const dur  = BigInt(days*86400);
+    const all  = await lp.allowance(userAddr, HCASH_MOAT_ADDR);
+    if (all < wei) {
+      setStatus('lockStatus','<span class="spin"></span> Approving LP…');
+      const a = await lp.approve(HCASH_MOAT_ADDR, ethers.MaxUint256); await a.wait();
+    }
+    setStatus('lockStatus',`<span class="spin"></span> Locking ${days}d… confirm in wallet`);
+    return await moat.lock(wei, dur, {gasLimit:280000n});
+  }, `✅ Locked ${fmtN(amt,4)} LP for ${days} days!`);
+}
 
-        const observer = new IntersectionObserver(handleIntersect, observerOptions);
+// ── UNSTAKE ──
+function unstakeMax() {
+  const inp = document.getElementById('unstakeAmt');
+  if (inp) inp.value = lpData.stakedBal.toFixed(8);
+}
+async function unstakeLp() {
+  const amt = parseFloat(document.getElementById('unstakeAmt')?.value)||0;
+  if (!amt) { setStatus('unstakeStatus','Enter amount'); return; }
+  if (!signer||!userAddr) { setStatus('unstakeStatus','Connect wallet'); return; }
+  initAddrs();
+  await runTx('unstakeStatus', async () => {
+    const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer);
+    const wei = ethers.parseEther(amt.toFixed(18));
+    setStatus('unstakeStatus','<span class="spin"></span> Unstaking… confirm in wallet');
+    return await moat.unstake(wei, {gasLimit:200000n});
+  }, `✅ Unstaked ${fmtN(amt,4)} LP!`);
+}
 
-        function observeElements() {
-            const animatedElements = document.querySelectorAll('.fade-in-up');
-            animatedElements.forEach(el => {
-                observer.observe(el);
-            });
-        }
+// ── REMOVE LIQUIDITY ──
+async function loadRemoveBals() {
+  if (!userAddr||!signer) return;
+  try {
+    const lp = new ethers.Contract(HCASH_LP_ADDR, ERC20_ABI, signer.provider);
+    const b = await lp.balanceOf(userAddr);
+    const lpB = parseFloat(ethers.formatEther(b));
+    lpData.lpBal = lpB;
+    setText('removeLpWallet', fmtN(lpB,6)+' LP');
+  } catch(e) {}
+}
+function removeMax() {
+  const inp = document.getElementById('removeAmt');
+  if (inp) { inp.value = lpData.lpBal.toFixed(8); previewRemove(); }
+}
+async function previewRemove() {
+  const amt = parseFloat(document.getElementById('removeAmt')?.value)||0;
+  const prev = document.getElementById('removePreview');
+  if (!amt||!prev) { if(prev) prev.textContent=''; return; }
+  try {
+    initAddrs();
+    const prov = signer?.provider || await getProvider();
+    const hcashAddr = await resolveHcashToken();
+    const router = new ethers.Contract(PHARAOH_ROUTER_ADDR, PHARAOH_ROUTER_ABI, prov);
+    const wei = ethers.parseEther(amt.toFixed(18));
+    const q = await router.quoteRemoveLiquidity(WAVAX_ADDR, hcashAddr, false, wei);
+    const avaxOut  = parseFloat(ethers.formatEther(q[0]));
+    const hcashOut = parseFloat(ethers.formatEther(q[1]));
+    prev.innerHTML = `<span style="color:var(--grn)">→</span> ~${fmtN(avaxOut,4)} AVAX + ${fmtN(hcashOut,0)} hCASH`;
+  } catch(e) { if(prev) prev.textContent='(preview not available)'; }
+}
+async function removeLp() {
+  const amt = parseFloat(document.getElementById('removeAmt')?.value)||0;
+  if (!amt) { setStatus('removeStatus','Enter amount'); return; }
+  if (!signer||!userAddr) { setStatus('removeStatus','Connect wallet'); return; }
+  initAddrs();
+  await runTx('removeStatus', async () => {
+    const lp   = new ethers.Contract(HCASH_LP_ADDR, ERC20_ABI, signer);
+    const router = new ethers.Contract(PHARAOH_ROUTER_ADDR, PHARAOH_ROUTER_ABI, signer);
+    const hcashAddr = await resolveHcashToken();
+    const wei = ethers.parseEther(amt.toFixed(18));
+    const deadline = BigInt(Math.floor(Date.now()/1000)+1800);
+    const allowed = await lp.allowance(userAddr, PHARAOH_ROUTER_ADDR);
+    if (allowed < wei) {
+      setStatus('removeStatus','<span class="spin"></span> Approving LP…');
+      const a = await lp.approve(PHARAOH_ROUTER_ADDR, ethers.MaxUint256); await a.wait();
+    }
+    setStatus('removeStatus','<span class="spin"></span> Removing liquidity… confirm in wallet');
+    return await router.removeLiquidityAVAX(hcashAddr, false, wei, 0n, 0n, userAddr, deadline, {gasLimit:350000n});
+  }, '✅ Liquidity removed!');
+}
 
-        // --- 4. GIFT CONFIGURATOR (Drag & Drop) LOGIC ---
-        function setupDragAndDrop() {
-            const dragItems = document.querySelectorAll('.drag-item');
-            const dropZone = document.getElementById('drop-zone');
-            const WHATSAPP_NUMBER = '2349134158314';
+// ── CLAIM REWARDS ──
+async function claimRewards() {
+  if (!signer||!userAddr) { showNotif('Connect wallet first','err'); return; }
+  initAddrs();
+  await runTx('lpClaimStatus', async () => {
+    const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer);
+    setStatus('lpClaimStatus','<span class="spin"></span> Claiming…');
+    return await moat.claimAllRewards({gasLimit:300000n});
+  }, '✅ Rewards claimed!');
+}
 
-            // Drag Start
-            dragItems.forEach(item => {
-                item.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', item.getAttribute('data-item'));
-                    e.target.style.opacity = '0.4';
-                });
+// ── MY LOCKS ──
+async function loadMyLocks() {
+  if (!userAddr||!signer) return;
+  try {
+    const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer.provider);
+    const res = await moat.getUserAllLocks(userAddr);
+    const [amounts, ends, pts, durations, indexes, active] = res;
+    lpData.locks = [];
+    for (let i=0;i<amounts.length;i++) {
+      if (!active[i]) continue;
+      lpData.locks.push({
+        idx: Number(indexes[i]),
+        amt: parseFloat(ethers.formatEther(amounts[i])),
+        endTs: Number(ends[i]),
+        origDur: Number(durations[i]),
+        pts: Number(pts[i]),
+      });
+    }
+    renderMyLocks();
+  } catch(e) { console.warn('locks:', e.message); }
+}
+function renderMyLocks() {
+  const el = document.getElementById('myLocksContent');
+  if (!el) return;
+  if (!lpData.locks.length) {
+    el.innerHTML = '<div style="text-align:center;padding:1.5rem;font-family:\'JetBrains Mono\',monospace;font-size:.65rem;color:var(--mut);border:1px dashed var(--bor);border-radius:9px">No active locks. Create one in the Lock LP tab.</div>';
+    return;
+  }
+  el.innerHTML = lpData.locks.map(l=>{
+    const now = Math.floor(Date.now()/1000);
+    const daysLeft = Math.max(0, Math.ceil((l.endTs-now)/86400));
+    const done = daysLeft===0;
+    const origDays = Math.round(l.origDur/86400);
+    const mult = lockMultiplier(origDays);
+    const elapsed = origDays - daysLeft;
+    const pct = Math.min(100, Math.round(elapsed/origDays*100));
+    const penPct = done?0:Math.round((1-elapsed/origDays)*50);
+    const wouldGet = done?l.amt : l.amt*(1-penPct/100);
+    return `<div style="background:var(--sur);border:1px solid ${done?'rgba(61,186,106,.3)':'rgba(212,168,67,.25)'};border-radius:11px;padding:.85rem;margin-bottom:.55rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.04em;color:var(--gld)">${fmtN(l.amt,6)} LP</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--dim);margin-left:8px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;padding:1px 5px">${mult}×</span>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:${done?'var(--grn)':'var(--gld)'};font-weight:700">${done?'MATURED':daysLeft+'d left'}</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;${done?'background:var(--grn)':''}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--mut);margin-bottom:.65rem">
+        <span>${pct}% · ${origDays}d lock</span>
+        <span>${done?'No penalty':'Early exit: ~'+penPct+'% penalty → '+fmtN(wouldGet,4)+' LP'}</span>
+      </div>
+      ${done
+        ? `<button class="btn btn-grn btn-sm" style="width:100%" onclick="exitLock(${l.idx})">✅ Claim — Full Amount</button>`
+        : `<button class="btn btn-sm" style="width:100%;background:transparent;border:1px solid var(--red);color:var(--red)" onclick="earlyExit(${l.idx},${l.amt},${daysLeft},${origDays})">⚠ Early Exit (~${fmtN(wouldGet,4)} LP)</button>`
+      }
+    </div>`;
+  }).join('');
+}
+async function exitLock(idx) {
+  if (!signer||!userAddr) { showNotif('Connect wallet','err'); return; }
+  initAddrs();
+  const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer);
+  try {
+    showNotif('Exiting lock — confirm in wallet…','info');
+    const tx = await moat.exitLock(idx, {gasLimit:200000n});
+    await tx.wait();
+    showNotif('Lock exited successfully!','ok');
+    setTimeout(()=>{ loadMyBalances(); loadMyLocks(); },3000);
+  } catch(e) { showNotif('Error: '+fmtErr(e),'err'); }
+}
+async function earlyExit(idx) {
+  if (!signer||!userAddr) { showNotif('Connect wallet','err'); return; }
+  if (!confirm('Early exit will incur a penalty. Confirm?')) return;
+  initAddrs();
+  const moat = new ethers.Contract(HCASH_MOAT_ADDR, MOAT_ABI, signer);
+  try {
+    showNotif('Emergency exit — confirm in wallet…','info');
+    const tx = await moat.earlyExitLock(idx, {gasLimit:200000n});
+    await tx.wait();
+    showNotif('Early exit done!','ok');
+    setTimeout(()=>{ loadMyBalances(); loadMyLocks(); },3000);
+  } catch(e) { showNotif('Error: '+fmtErr(e),'err'); }
+}
 
-                item.addEventListener('dragend', (e) => {
-                    e.target.style.opacity = '1';
-                });
-            });
+// ── LEADERBOARD ──
+function renderLeaderboard() {
+  const body = document.getElementById('lbBody');
+  if (!body||!lbData.length) return;
+  const total = lbData.reduce((s,p)=>s+p.points,0);
+  const medals = ['🥇','🥈','🥉'];
+  body.innerHTML = lbData.slice(0,50).map((p,i)=>{
+    const share = total>0?(p.points/total*100).toFixed(2):'0.00';
+    const rkCls = i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    return `<tr>
+      <td><span class="rk ${rkCls}">${medals[i]||i+1}</span></td>
+      <td><span class="wa" onclick="navigator.clipboard&&navigator.clipboard.writeText('${p.walletAddress}')">${shortAddr(p.walletAddress)}</span></td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.04em;color:var(--red)">${fmtP(p.points)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--mut)">${share}%</td>
+    </tr>`;
+  }).join('');
+  setText('lbUpdated', 'Updated '+new Date().toLocaleTimeString());
+  // Distribution
+  const dist = document.getElementById('lbDist');
+  if (dist&&lbData.length) {
+    const top1 = total>0?(lbData[0].points/total*100).toFixed(1):0;
+    const top5 = total>0?(lbData.slice(0,5).reduce((s,p)=>s+p.points,0)/total*100).toFixed(1):0;
+    const top10 = total>0?(lbData.slice(0,10).reduce((s,p)=>s+p.points,0)/total*100).toFixed(1):0;
+    dist.innerHTML = [['Top 1',top1+'%'],['Top 5',top5+'%'],['Top 10',top10+'%'],['Total Wallets',lbData.length]].map(([l,v])=>`
+      <div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--bor)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--mut)">${l}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.04em;color:var(--red)">${v}</span>
+      </div>`).join('');
+  }
+  updateMyRank();
+}
 
-            // Drop Zone Events
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault(); 
-                e.currentTarget.classList.add('drop-zone-active');
-            });
+// ── SWAP ──
+function setSlip(val, el) {
+  slippage = val;
+  document.querySelectorAll('[id^="slip"]').forEach(b=>{
+    if (!b.id.startsWith('slipC')) { b.className='btn btn-sm btn-g'; }
+  });
+  if (el) { el.className='btn btn-sm'; }
+}
+async function loadSwapBals() {
+  if (!userAddr||!signer) return;
+  try {
+    const prov = signer.provider;
+    const avax = await prov.getBalance(userAddr);
+    const wavax = new ethers.Contract(WAVAX_ADDR, WAVAX_ABI, prov);
+    const usdc = new ethers.Contract(USDC_ADDR, ERC20_ABI, prov);
+    const hcashAddr = await resolveHcashToken();
+    const hcash = new ethers.Contract(hcashAddr, ERC20_ABI, prov);
+    const [wBal, uBal, hBal, hDec] = await Promise.allSettled([wavax.balanceOf(userAddr), usdc.balanceOf(userAddr), hcash.balanceOf(userAddr), hcash.decimals()]);
+    setText('swapFromBal', 'AVAX: '+fmtN(parseFloat(ethers.formatEther(avax)),4));
+    setText('swapToBal', 'hCASH: '+fmtN(parseFloat(ethers.formatUnits(hBal.value||0n, Number(hDec.value||18n))),0));
+  } catch(e) {}
+}
+function swapSetToken(tok) {
+  swapToken = tok;
+  ['avax','usdc'].forEach(t=>{
+    const b = document.getElementById('swapBtn_'+t);
+    if(b) b.className='token-chip'+(t===tok?' sel':'');
+  });
+  swapQuote();
+}
+function swapMax() {
+  const amt = document.getElementById('swapAmt');
+  if (amt) { amt.value = swapToken==='avax' ? (lpData.avaxBal||0).toFixed(4) : '0'; swapQuote(); }
+}
+function swapFlip() { swapSetToken(swapToken==='avax'?'usdc':'avax'); }
+async function swapQuote() {
+  const amt = parseFloat(document.getElementById('swapAmt')?.value)||0;
+  const info = document.getElementById('swapInfo');
+  const route = document.getElementById('swapRoute');
+  if (!amt) { if(info) info.textContent=''; if(route) route.textContent=''; setText('swapOut','0.00'); return; }
+  if (info) info.innerHTML='<span class="spin"></span> Getting quote…';
+  try {
+    initAddrs();
+    const prov = await getProvider();
+    const hcashAddr = await resolveHcashToken();
+    const router = new ethers.Contract(PHARAOH_ROUTER_ADDR, PHARAOH_ROUTER_ABI, prov);
+    const amtWei = swapToken==='avax' ? ethers.parseEther(amt.toFixed(6)) : ethers.parseUnits(amt.toFixed(6), 6);
+    const fromTok = swapToken==='avax' ? WAVAX_ADDR : USDC_ADDR;
+    const routes = swapToken==='avax'
+      ? [{from:WAVAX_ADDR, to:hcashAddr, stable:false}]
+      : [{from:USDC_ADDR, to:WAVAX_ADDR, stable:false},{from:WAVAX_ADDR, to:hcashAddr, stable:false}];
+    const amts = await router.getAmountsOut(amtWei, routes);
+    const outWei = amts[amts.length-1];
+    const out = parseFloat(ethers.formatEther(outWei));
+    setText('swapOut', fmtN(out,0));
+    if (info) info.innerHTML = `1 ${swapToken.toUpperCase()} ≈ <span style="color:var(--grn)">${fmtN(out/amt,0)} hCASH</span>`;
+    if (route) route.textContent = swapToken==='avax' ? 'AVAX → WAVAX → hCASH (Pharaoh)' : 'USDC → WAVAX → hCASH (Pharaoh)';
+  } catch(e) { if(info) info.innerHTML=`<span style="color:var(--red)">Quote failed: ${e.message.slice(0,50)}</span>`; }
+}
+async function doSwap() {
+  const amt = parseFloat(document.getElementById('swapAmt')?.value)||0;
+  const statusEl = document.getElementById('swapStatus');
+  if (!amt) { if(statusEl) statusEl.textContent='Enter amount'; return; }
+  if (!signer||!userAddr) { if(statusEl) statusEl.textContent='Connect wallet first'; return; }
+  initAddrs();
+  const hcashAddr = await resolveHcashToken();
+  const router = new ethers.Contract(PHARAOH_ROUTER_ADDR, PHARAOH_ROUTER_ABI, signer);
+  const deadline = BigInt(Math.floor(Date.now()/1000)+1800);
+  try {
+    if (swapToken==='avax') {
+      const amtWei = ethers.parseEther(amt.toFixed(6));
+      const routes = [{from:WAVAX_ADDR, to:hcashAddr, stable:false}];
+      const outs = await router.getAmountsOut(amtWei, routes);
+      const minOut = outs[outs.length-1] * BigInt(Math.floor((1-slippage/100)*10000)) / 10000n;
+      setStatus('swapStatus','<span class="spin"></span> Swapping AVAX → hCASH…');
+      const tx = await router.swapExactAVAXForTokens(minOut, routes, userAddr, deadline, {value:amtWei, gasLimit:250000n});
+      setStatus('swapStatus','<span class="spin"></span> Waiting…');
+      const rc = await tx.wait();
+      setStatus('swapStatus',`<span style="color:var(--grn)">✅ Swapped! <a href="https://snowtrace.io/tx/${rc.hash}" target="_blank" style="color:var(--grn)">${rc.hash.slice(0,12)}…</a></span>`);
+      showNotif('Swap successful!','ok');
+    } else {
+      const amtWei = ethers.parseUnits(amt.toFixed(6), 6);
+      const usdc = new ethers.Contract(USDC_ADDR, ERC20_ABI, signer);
+      const all = await usdc.allowance(userAddr, PHARAOH_ROUTER_ADDR);
+      if (all < amtWei) {
+        setStatus('swapStatus','<span class="spin"></span> Approving USDC…');
+        const a = await usdc.approve(PHARAOH_ROUTER_ADDR, ethers.MaxUint256); await a.wait();
+      }
+      const routes = [{from:USDC_ADDR,to:WAVAX_ADDR,stable:false},{from:WAVAX_ADDR,to:hcashAddr,stable:false}];
+      const outs = await router.getAmountsOut(amtWei, routes);
+      const minOut = outs[outs.length-1] * BigInt(Math.floor((1-slippage/100)*10000)) / 10000n;
+      setStatus('swapStatus','<span class="spin"></span> Swapping USDC → hCASH…');
+      const tx = await router.swapExactTokensForTokens(amtWei, minOut, routes, userAddr, deadline, {gasLimit:320000n});
+      const rc = await tx.wait();
+      setStatus('swapStatus',`<span style="color:var(--grn)">✅ Swapped! <a href="https://snowtrace.io/tx/${rc.hash}" target="_blank" style="color:var(--grn)">${rc.hash.slice(0,12)}…</a></span>`);
+      showNotif('Swap successful!','ok');
+    }
+  } catch(e) { setStatus('swapStatus','<span style="color:var(--red)">❌ '+fmtErr(e)+'</span>'); }
+}
 
-            dropZone.addEventListener('dragleave', (e) => {
-                e.currentTarget.classList.remove('drop-zone-active');
-            });
+// ── MINERS ──
+async function loadMiners() {
+  const apiKey = document.getElementById('hcApiKey')?.value?.trim();
+  const statusEl = document.getElementById('hcApiStatus');
+  const cardsEl = document.getElementById('minerCards');
+  const headers = {};
+  if (apiKey) headers['x-api-key'] = apiKey;
+  if (statusEl) statusEl.innerHTML='<span class="spin"></span> Fetching from api.hashcash.club…';
+  try {
+    const r = await fetch(`${HC_API}/contracts`, {headers});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    const contracts = data.contracts || data;
+    // Filter miner_nft only
+    minersList = contracts.filter(c=>c.category==='miner_nft');
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--grn)">✅ Connected</span> · ${contracts.length} contracts · ${minersList.length} miners`;
+    if (cardsEl) cardsEl.innerHTML = minersList.map((m,i)=>`
+      <div class="mc" onclick="openMiner(${i})">
+        <img class="mc-img" src="${m.imageUrl||''}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect width=%22200%22 height=%22200%22 fill=%22%231a1515%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2260%22>⛏</text></svg>'" loading="lazy">
+        <div class="mc-body">
+          <div class="mc-name">${m.name||m.id}</div>
+          ${m.minerStats ? `
+            <div class="mc-stat">⚡ <span>${m.minerStats.hashrateFormatted||m.minerStats.hashrateMhps+'MH/s'}</span></div>
+            <div class="mc-stat">🔋 <span>${m.minerStats.powerFormatted||m.minerStats.powerWatts+'W'}</span></div>` : ''}
+          ${m.symbol ? `<div class="mc-stat" style="color:var(--mut)">${m.symbol}</div>` : ''}
+        </div>
+      </div>`).join('');
+    if (!minersList.length) {
+      cardsEl.innerHTML = '<div style="grid-column:span 5;padding:2rem;text-align:center;font-family:\'JetBrains Mono\',monospace;font-size:.65rem;color:var(--mut)">No miner NFTs found. Try with your API key.</div>';
+    }
+  } catch(e) {
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span> · Enter API key above`;
+    if (cardsEl) cardsEl.innerHTML = `<div style="grid-column:span 5;padding:2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--mut)">Could not load miners. Make sure you have a valid API key from hashcash.club</div>`;
+  }
+}
 
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.currentTarget.classList.remove('drop-zone-active');
-                
-                const data = e.dataTransfer.getData('text/plain');
-                if (data) {
-                    addItemToCart(data);
-                }
-            });
-        }
-        
-        function updateCartDisplay() {
-            const summaryEl = document.getElementById('cart-summary');
-            const vizElements = document.querySelectorAll('.viz-item');
+async function openMiner(idx) {
+  activeMiner = minersList[idx];
+  document.getElementById('minerGrid').style.display = 'none';
+  document.getElementById('minerDetail').style.display = 'block';
+  const m = activeMiner;
 
-            // 1. Update Visualization
-            vizElements.forEach(el => el.classList.remove('active'));
-            
-            selectedItems.forEach(item => {
-                const normalizedItem = item.replace(/[^a-zA-Z0-9]/g, '-').replace(/-$/, '');
-                const vizEl = document.getElementById(`viz-${normalizedItem}`);
-                if (vizEl) {
-                    vizEl.classList.add('active');
-                }
-            });
+  // Hero
+  const hero = document.getElementById('minerHero');
+  hero.innerHTML = `
+    <img class="miner-hero-img" src="${m.imageUrl||''}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><rect width=%22180%22 height=%22180%22 fill=%22%231a1515%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2270%22>⛏</text></svg>'" alt="${m.name}">
+    <div class="miner-hero-body">
+      <div class="miner-hero-name">${m.name||m.id}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.65rem">
+        ${m.symbol?`<span class="badge">${m.symbol}</span>`:''}
+        ${m.category?`<span class="badge badge-gld">${m.category}</span>`:''}
+        ${m.live?'<span class="badge badge-grn">LIVE</span>':''}
+        ${m.rigVersion?`<span class="badge">${m.rigVersion}</span>`:''}
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--dim);line-height:1.7;word-break:break-all">
+        <div style="margin-bottom:.3rem"><span style="color:var(--mut)">Contract:</span> ${m.address||'—'}</div>
+        <div><span style="color:var(--mut)">ABI:</span> ${m.abiId||'—'}</div>
+      </div>
+      ${m.minerStats ? `
+      <div class="miner-stats-grid">
+        <div class="miner-stat-card"><div class="miner-stat-label">Hashrate</div><div class="miner-stat-val" style="color:var(--red)">${m.minerStats.hashrateFormatted||'—'}</div><div class="miner-stat-sub">${m.minerStats.hashrateHps||''} H/s exact</div></div>
+        <div class="miner-stat-card"><div class="miner-stat-label">Power</div><div class="miner-stat-val" style="color:var(--gld)">${m.minerStats.powerFormatted||'—'}</div><div class="miner-stat-sub">${m.minerStats.powerWatts!=null?m.minerStats.powerWatts+'W':''}</div></div>
+        <div class="miner-stat-card"><div class="miner-stat-label">Hashrate (raw)</div><div class="miner-stat-val">${m.minerStats.hashrateRaw||'—'}</div><div class="miner-stat-sub">on-chain raw</div></div>
+        <div class="miner-stat-card"><div class="miner-stat-label">Power (raw)</div><div class="miner-stat-val">${m.minerStats.powerRaw||'—'}</div><div class="miner-stat-sub">base units</div></div>
+      </div>` : ''}
+    </div>`;
 
-            // 2. Update Text Summary
-            if (selectedItems.size === 0) {
-                summaryEl.textContent = 'Your custom gift cart is empty. Drag items to add them!';
-            } else {
-                summaryEl.textContent = `Current Cart (${selectedItems.size} items): ${Array.from(selectedItems).join(', ')}.`;
-            }
-        }
+  // On-chain data
+  fetchMinerOnChain(m);
 
-        function addItemToCart(item) {
-            if (!selectedItems.has(item)) {
-                selectedItems.add(item);
-                updateCartDisplay();
-            }
-        }
-        
-        function clearCart() {
-            selectedItems.clear();
-            updateCartDisplay();
-        }
+  // All fields table
+  const fieldsTbl = document.getElementById('minerFieldsTbl')?.querySelector('tbody');
+  if (fieldsTbl) {
+    fieldsTbl.innerHTML = Object.entries(m).filter(([k])=>k!=='minerStats').map(([k,v])=>`
+      <tr><td style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--mut);white-space:nowrap">${k}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.6rem;word-break:break-all">${v!=null?String(v):'—'}</td></tr>`).join('');
+  }
+}
 
-        function openWhatsAppCart() {
-            if (selectedItems.size === 0) {
-                // Instead of alert, use a subtle visual cue (like glowing the button) or log to console
-                console.error("Cart is empty. Please select items first.");
-                document.getElementById('drop-zone').classList.add('glowing-shadow');
-                setTimeout(() => document.getElementById('drop-zone').classList.remove('glowing-shadow'), 500);
-                return;
-            }
+async function fetchMinerOnChain(m) {
+  const tbl = document.getElementById('minerOnChainTbl')?.querySelector('tbody');
+  const statsEl = document.getElementById('minerStatsContent');
+  if (!tbl) return;
+  tbl.innerHTML = '<tr><td colspan="2" style="font-family:\'JetBrains Mono\',monospace;font-size:.6rem;color:var(--mut)"><span class="spin"></span> Fetching on-chain…</td></tr>';
+  try {
+    const prov = await getProvider();
+    const addr = m.address;
+    if (!addr) throw new Error('No address');
+    const contract = new ethers.Contract(addr, ERC20_ABI, prov);
+    const rows = [];
+    const safe = async(fn,label) => {
+      try { const v=await fn(); rows.push([label, typeof v==='bigint'?v.toString():String(v)]); } catch(e) { rows.push([label,'N/A']); }
+    };
+    await Promise.all([
+      safe(()=>contract.name(), 'name()'),
+      safe(()=>contract.symbol(), 'symbol()'),
+      safe(()=>contract.totalSupply(), 'totalSupply()'),
+      safe(()=>contract.decimals(), 'decimals()'),
+    ]);
+    // Also try balanceOf dead addr & moat
+    try { const b=await contract.balanceOf('0x000000000000000000000000000000000000dEaD'); rows.push(['balanceOf(0xDead)', b.toString()]); } catch(e){}
 
-            const itemsList = Array.from(selectedItems).map((item, index) => `${index + 1}. ${item}`).join('%0A'); // %0A is newline in URL
-            const message = `Hello Favours Surprises! I'm interested in ordering a customized surprise for my loved one. %0A%0A*My Custom Gift Cart*%0A${itemsList}%0A%0A---%0A%0APlease let me know the price for this combination and the next steps for delivery. Thank you!`;
-            
-            const WHATSAPP_NUMBER = '2349134158314';
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-            
-            window.open(whatsappUrl, '_blank');
-        }
+    tbl.innerHTML = rows.map(([k,v])=>`<tr><td style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--mut);white-space:nowrap">${k}</td><td style="font-family:'JetBrains Mono',monospace;font-size:.6rem;word-break:break-all;color:var(--txt)">${v}</td></tr>`).join('');
+    
+    if (statsEl && m.minerStats) {
+      statsEl.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+          ${Object.entries(m.minerStats).map(([k,v])=>`
+            <div style="background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:.6rem">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:.49rem;color:var(--mut);text-transform:uppercase;margin-bottom:.2rem">${k}</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.04em;color:var(--red)">${v!=null?String(v):'—'}</div>
+            </div>`).join('')}
+        </div>`;
+    } else if (statsEl) {
+      statsEl.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:.62rem;color:var(--mut)">No miner stats available for this contract.</div>';
+    }
+  } catch(e) {
+    tbl.innerHTML = `<tr><td colspan="2" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--red)">Error: ${e.message}</td></tr>`;
+  }
+}
+function backToMiners() {
+  document.getElementById('minerGrid').style.display = 'block';
+  document.getElementById('minerDetail').style.display = 'none';
+  activeMiner = null;
+}
 
+// ── CALCULATOR ──
+function selectCalcMode(mode, el) {
+  calcMode = mode;
+  document.querySelectorAll('[data-m]').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  calcPoints();
+}
+function calcPoints() {
+  const lp = parseFloat(document.getElementById('calcLp')?.value)||0;
+  const res = document.getElementById('calcResult');
+  const total = lbData.reduce((s,p)=>s+p.points,0)||1;
+  if (!lp) { if(res) res.style.display='none'; return; }
+  const modeMap = {stake:{mult:1,days:1},lock90:{mult:2.73,days:90},lock365:{mult:4.0,days:365},lock730:{mult:5.0,days:730}};
+  const {mult, days} = modeMap[calcMode]||{mult:1,days:1};
+  const pts = calcMode==='stake' ? lp : lp*mult*days;
+  const share = ((pts/(total+pts))*100).toFixed(3);
+  if(res) {
+    res.style.display='block';
+    setText('calcPts', fmtP(pts));
+    setText('calcMult', mult+'×');
+    setText('calcDuration', days>1?days+'d':'Flexible');
+    setText('calcShare', '~'+share+'%');
+  }
+}
+function calcEEL() {
+  const amt = parseFloat(document.getElementById('eelAmt')?.value)||0;
+  const total = parseInt(document.getElementById('eelTotalDays')?.value)||0;
+  const elapsed = parseInt(document.getElementById('eelElapsed')?.value)||0;
+  const res = document.getElementById('eelResult');
+  if (!amt||!total||elapsed<0) { if(res) res.style.display='none'; return; }
+  const pct = elapsed>=total ? 0 : Math.max(0, (1-(elapsed/total))*50);
+  const penalty = amt*pct/100;
+  const receive = amt - penalty;
+  const burned = penalty*0.95;
+  const fee = penalty*0.05;
+  if(res) {
+    res.style.display='block';
+    setText('eelPenPct', pct.toFixed(1)+'%');
+    setText('eelReceive', fmtN(receive,6)+' LP');
+    setText('eelBurned', fmtN(burned,6)+' LP');
+    setText('eelFee', fmtN(fee,6)+' LP');
+  }
+}
 
-        // Initial setup on window load
-        window.onload = function() {
-            setupDragAndDrop();
-            updateCartDisplay(); // Initialize empty cart display
+// ── TX HELPER ──
+async function runTx(statusId, fn, successMsg) {
+  try {
+    const tx = await fn();
+    setStatus(statusId,'<span class="spin"></span> Waiting for confirmation…');
+    const rc = await tx.wait();
+    setStatus(statusId,`<span style="color:var(--grn)">${successMsg} <a href="https://snowtrace.io/tx/${rc.hash}" target="_blank" style="color:var(--grn)">${rc.hash.slice(0,12)}…</a></span>`);
+    showNotif(successMsg,'ok');
+    setTimeout(()=>{ loadMyBalances(); loadMyLocks(); },3000);
+  } catch(e) { setStatus(statusId,'<span style="color:var(--red)">❌ '+fmtErr(e)+'</span>'); showNotif('Error: '+fmtErr(e),'err'); }
+}
+function fmtErr(e) { let m=e?.reason||e?.shortMessage||e?.message||String(e); if(m.includes('user rejected')||m.includes('ACTION_REJECTED'))m='Rejected in wallet.'; return m.length>100?m.slice(0,100)+'…':m; }
+function setText(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+function setStatus(id, html) { const el=document.getElementById(id); if(el) el.innerHTML=html; }
 
-            // Note: Slider and IntersectionObserver are started by closeModal() 
-            // after the user dismisses the intro message.
-            setTimeout(() => {
-                 const modal = document.getElementById('intro-modal');
-                 if (modal) {
-                    // Modal is present, user must click to dismiss
-                 } else {
-                    // Fallback: start automatically
-                    startImageSlider();
-                    observeElements();
-                 }
-            }, 100);
-        };
-
-    </script>
+// ── INIT ──
+window.addEventListener('load', async() => {
+  initAddrs();
+  loadAll();
+  setInterval(()=>{ loadMoatPoints(); loadEvents(); loadOverviewData(); }, 30000);
+});
+</script>
 </body>
 </html>
