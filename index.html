@@ -361,9 +361,6 @@
                     <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><span class="text-neonorange">🚀</span> Fuji Token Launcher</h2>
                     <p class="text-[11px] text-gray-500">Deploy and trade real Fuji tokens from your wallet. Uses on-chain transactions only (no mocks).</p>
                     <div class="space-y-2">
-                        <input id="launch-name" placeholder="Token Name (e.g. Mars Inu)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
-                        <input id="launch-symbol" placeholder="Symbol (e.g. MINU)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
-                        <input id="launch-supply" type="number" value="1000000" placeholder="Initial Supply" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
                         <input id="launch-token-address" placeholder="Token Address (for buy/sell + LP)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
                         <input id="launch-avax" type="number" value="5" placeholder="AVAX Amount" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
                         <input id="launch-tokens" type="number" value="1000" placeholder="Token Amount (LP/Sell)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
@@ -575,9 +572,6 @@
             // History
             txHistoryList: document.getElementById('tx-history-list'),
             clearHistory: document.getElementById('clear-history'),
-            launchName: document.getElementById('launch-name'),
-            launchSymbol: document.getElementById('launch-symbol'),
-            launchSupply: document.getElementById('launch-supply'),
             launchAvax: document.getElementById('launch-avax'),
             launchTokens: document.getElementById('launch-tokens'),
             launchTokenAddress: document.getElementById('launch-token-address'),
