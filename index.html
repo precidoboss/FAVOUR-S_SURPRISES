@@ -359,15 +359,15 @@
                 <!-- LAUNCH TAB -->
                 <div class="tab-pane p-5 space-y-4" id="tab-launch">
                     <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><span class="text-neonorange">🚀</span> Fuji Token Launcher</h2>
-                    <p class="text-[11px] text-gray-500">Deploys a mock token profile + LP checklist for LFJ on Fuji. Use for testnet workflows only.</p>
+                    <p class="text-[11px] text-gray-500">Deploy and trade real Fuji tokens from your wallet. Uses on-chain transactions only (no mocks).</p>
                     <div class="space-y-2">
-                        <input id="launch-name" placeholder="Token Name (e.g. Mars Inu)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
-                        <input id="launch-symbol" placeholder="Symbol (e.g. MINU)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
-                        <input id="launch-supply" type="number" value="1000000" placeholder="Initial Supply" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
-                        <input id="launch-avax" type="number" value="5" placeholder="Initial AVAX for LP" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                        <input id="launch-token-address" placeholder="Token Address (for buy/sell + LP)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                        <input id="launch-avax" type="number" value="5" placeholder="AVAX Amount" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                        <input id="launch-tokens" type="number" value="1000" placeholder="Token Amount (LP/Sell)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
                     </div>
-                    <button id="btn-launch-token" class="btn-neon w-full py-2 rounded text-sm font-bold">LAUNCH TOKEN PROFILE</button>
-                    <button id="btn-add-lfj" class="w-full py-2 rounded text-sm font-bold border border-martianpurple text-martianpurple hover:bg-martianpurple/10">ADD LIQUIDITY PLAN (LFJ)</button>
+                    <button id="btn-launch-token" class="btn-neon w-full py-2 rounded text-sm font-bold">BUY TOKEN (REAL TX)</button>
+                    <button id="btn-add-lfj" class="w-full py-2 rounded text-sm font-bold border border-martianpurple text-martianpurple hover:bg-martianpurple/10">ADD LIQUIDITY ON LFJ (REAL TX)</button>
+                    <button id="btn-arm-sell" class="w-full py-2 rounded text-sm font-bold border border-neonorange text-neonorange hover:bg-neonorange/10">ARM SELL ALERT</button>
                     <div id="launch-output" class="hidden bg-deepspace/60 rounded-lg p-3 text-xs font-mono border border-gray-800 text-gray-300"></div>
                 </div>
 
@@ -572,12 +572,12 @@
             // History
             txHistoryList: document.getElementById('tx-history-list'),
             clearHistory: document.getElementById('clear-history'),
-            launchName: document.getElementById('launch-name'),
-            launchSymbol: document.getElementById('launch-symbol'),
-            launchSupply: document.getElementById('launch-supply'),
             launchAvax: document.getElementById('launch-avax'),
+            launchTokens: document.getElementById('launch-tokens'),
+            launchTokenAddress: document.getElementById('launch-token-address'),
             btnLaunchToken: document.getElementById('btn-launch-token'),
             btnAddLfj: document.getElementById('btn-add-lfj'),
+            btnArmSell: document.getElementById('btn-arm-sell'),
             launchOutput: document.getElementById('launch-output'),
         };
 
@@ -604,10 +604,26 @@
             swapDirection: 'wrap', // wrap = AVAX->WAVAX, unwrap = WAVAX->AVAX
             priceHistory: [],
             txHistory: [],
+            sellAlertArmed: false,
         };
 
         // WAVAX Fuji address
         const WAVAX_ADDRESS = "0xd00ae08403B9bbb9124bB305C09058E32C39A48c";
+
+        const LFJ_ROUTER = "0x2D99ABD9008Dc933ff5c0CD271B88309593aB921";
+        const ROUTER_ABI = [
+            "function swapExactAVAXForTokens(uint amountOutMin,address[] calldata path,address to,uint deadline) payable returns (uint[] memory amounts)",
+            "function swapExactTokensForAVAX(uint amountIn,uint amountOutMin,address[] calldata path,address to,uint deadline) returns (uint[] memory amounts)",
+            "function addLiquidityAVAX(address token,uint amountTokenDesired,uint amountTokenMin,uint amountAVAXMin,address to,uint deadline) payable returns (uint amountToken,uint amountAVAX,uint liquidity)",
+            "function getAmountsOut(uint amountIn,address[] calldata path) view returns (uint[] memory amounts)"
+        ];
+        const ERC20_ABI = [
+            "function approve(address spender,uint256 value) returns (bool)",
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)",
+            "function symbol() view returns (string)"
+        ];
+
         const WAVAX_ABI = [
             "function deposit() payable",
             "function withdraw(uint256 wad)",
@@ -1094,6 +1110,7 @@
                 const cond = UI.triggerCondition.value === 'lte' ? '≤' : '≥';
                 logMsg(`⚡ TRIGGER MET! $${state.currentPrice.toFixed(2)} ${cond} $${state.targetPrice.toFixed(2)}`, 'success');
                 const actionMode = UI.actionMode.value;
+                if (state.sellAlertArmed) { logMsg('SELL SIGNAL: condition met — consider swapping token -> AVAX now.', 'success'); state.sellAlertArmed = false; }
                 if (actionMode === 'alert') {
                     logMsg('Action: ALERT ONLY — No transaction sent.', 'warn');
                     if (!state.isRepeat) stopAgent();
@@ -1153,30 +1170,54 @@
         }
 
 
-        function launchTokenProfile() {
-            const name = UI.launchName.value.trim();
-            const symbol = UI.launchSymbol.value.trim().toUpperCase();
-            const supply = parseFloat(UI.launchSupply.value || '0');
-            if (!name || !symbol || supply <= 0) {
-                logMsg('Launcher: missing token fields.', 'error');
-                return;
-            }
-            const pseudoAddress = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b=>b.toString(16).padStart(2,'0')).join('');
-            UI.launchOutput.classList.remove('hidden');
-            UI.launchOutput.innerHTML = `Token <span class="text-neonorange">${name} (${symbol})</span><br>Supply: ${supply.toLocaleString()}<br>Mock Address: ${pseudoAddress}<br>Status: Ready for Fuji testing`;
-            logMsg(`Token launcher: prepared ${symbol} on Fuji profile (mock).`, 'success');
+        async function launchTokenProfile() {
+            if (!signer) return logMsg('Connect wallet first.', 'error');
+            const tokenAddr = UI.launchTokenAddress.value.trim();
+            const avaxIn = parseFloat(UI.launchAvax.value || '0');
+            if (!ethers.isAddress(tokenAddr) || avaxIn <= 0) return logMsg('Invalid token address or AVAX amount.', 'error');
+            try {
+                const router = new ethers.Contract(LFJ_ROUTER, ROUTER_ABI, signer);
+                const path = [WAVAX_ADDRESS, tokenAddr];
+                const deadline = Math.floor(Date.now()/1000)+60*10;
+                const tx = await router.swapExactAVAXForTokens(0, path, state.fullAddress, deadline, { value: ethers.parseEther(String(avaxIn)) });
+                logMsg(`Buy submitted: ${tx.hash}`, 'info');
+                const rc = await tx.wait();
+                UI.launchOutput.classList.remove('hidden');
+                UI.launchOutput.innerHTML = `Buy executed.<br>Token: ${tokenAddr}<br>AVAX spent: ${avaxIn}<br>Block: ${rc.blockNumber}`;
+                logMsg('Buy confirmed.', 'success');
+            } catch (e) { logMsg(`Buy failed: ${e.message?.slice(0,120)}`, 'error'); }
         }
 
-        function buildLfjLiquidityPlan() {
-            const symbol = (UI.launchSymbol.value || 'TOKEN').toUpperCase();
-            const avax = parseFloat(UI.launchAvax.value || '0');
-            if (avax <= 0) {
-                logMsg('LFJ plan: set AVAX amount > 0.', 'error');
-                return;
-            }
+        async function buildLfjLiquidityPlan() {
+            if (!signer) return logMsg('Connect wallet first.', 'error');
+            const tokenAddr = UI.launchTokenAddress.value.trim();
+            const avaxAmt = parseFloat(UI.launchAvax.value || '0');
+            const tokenAmt = parseFloat(UI.launchTokens.value || '0');
+            if (!ethers.isAddress(tokenAddr) || avaxAmt<=0 || tokenAmt<=0) return logMsg('Invalid LP inputs.', 'error');
+            try {
+                const erc20 = new ethers.Contract(tokenAddr, ERC20_ABI, signer);
+                const router = new ethers.Contract(LFJ_ROUTER, ROUTER_ABI, signer);
+                const decimals = await erc20.decimals();
+                const tokenWei = ethers.parseUnits(String(tokenAmt), decimals);
+                await (await erc20.approve(LFJ_ROUTER, tokenWei)).wait();
+                const deadline = Math.floor(Date.now()/1000)+60*10;
+                const tx = await router.addLiquidityAVAX(tokenAddr, tokenWei, 0, 0, state.fullAddress, deadline, { value: ethers.parseEther(String(avaxAmt)) });
+                logMsg(`LP add submitted: ${tx.hash}`, 'info');
+                const rc = await tx.wait();
+                UI.launchOutput.classList.remove('hidden');
+                UI.launchOutput.innerHTML = `Liquidity added on LFJ.<br>Token: ${tokenAddr}<br>Tokens: ${tokenAmt}<br>AVAX: ${avaxAmt}<br>Block: ${rc.blockNumber}`;
+                logMsg('Liquidity added successfully.', 'success');
+            } catch (e) { logMsg(`LP failed: ${e.message?.slice(0,120)}`, 'error'); }
+        }
+
+        function armSellAlert() {
+            const tokenAddr = UI.launchTokenAddress.value.trim();
+            const target = parseFloat(UI.inputTarget.value || '0');
+            if (!ethers.isAddress(tokenAddr) || target <= 0) return logMsg('Set token address + valid trigger price.', 'error');
+            state.sellAlertArmed = true;
             UI.launchOutput.classList.remove('hidden');
-            UI.launchOutput.innerHTML = `LFJ Liquidity Plan<br>1) Open <span class="text-martianpurple">https://lfj.gg</span> on Fuji network<br>2) Create ${symbol}/AVAX pair<br>3) Seed with ${avax} AVAX + matching ${symbol}<br>4) Confirm pool + save LP tx hash`;
-            logMsg(`LFJ plan generated for ${symbol}/AVAX with ${avax} AVAX.`, 'info');
+            UI.launchOutput.innerHTML = `Sell alert armed for ${tokenAddr}<br>Trigger: AVAX ${UI.triggerCondition.value==='gte'?'>=':'<='} $${target}`;
+            logMsg('Sell alert armed. Agent will notify when condition is met.', 'warn');
         }
 
         // --- Event Listeners ---
@@ -1195,6 +1236,7 @@
         UI.btnDestruct.addEventListener('click', selfDestruct);
         UI.btnLaunchToken.addEventListener('click', launchTokenProfile);
         UI.btnAddLfj.addEventListener('click', buildLfjLiquidityPlan);
+        UI.btnArmSell.addEventListener('click', armSellAlert);
         UI.toggleHyper.addEventListener('change', (e) => {
             state.isHyperDrive = e.target.checked;
             if (state.agentStatus !== 'idle') { stopAgent(); startAgent(); }
