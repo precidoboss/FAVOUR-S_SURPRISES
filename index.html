@@ -209,6 +209,7 @@
                     <button class="tab-btn active flex-1 py-3 text-xs font-mono font-bold tracking-widest uppercase text-gray-300" data-tab="agent">⚙ Agent</button>
                     <button class="tab-btn flex-1 py-3 text-xs font-mono font-bold tracking-widest uppercase text-gray-300" data-tab="swap">⇄ Swap</button>
                     <button class="tab-btn flex-1 py-3 text-xs font-mono font-bold tracking-widest uppercase text-gray-300" data-tab="history">☰ History</button>
+                    <button class="tab-btn flex-1 py-3 text-xs font-mono font-bold tracking-widest uppercase text-gray-300" data-tab="launch">🚀 Launch</button>
                 </div>
 
                 <!-- AGENT TAB -->
@@ -353,6 +354,21 @@
                     <button id="btn-swap" class="btn-neon w-full py-3 rounded-xl font-bold text-white text-sm tracking-wider disabled:opacity-40" disabled>
                         CONNECT WALLET TO SWAP
                     </button>
+                </div>
+
+                <!-- LAUNCH TAB -->
+                <div class="tab-pane p-5 space-y-4" id="tab-launch">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><span class="text-neonorange">🚀</span> Fuji Token Launcher</h2>
+                    <p class="text-[11px] text-gray-500">Deploys a mock token profile + LP checklist for LFJ on Fuji. Use for testnet workflows only.</p>
+                    <div class="space-y-2">
+                        <input id="launch-name" placeholder="Token Name (e.g. Mars Inu)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                        <input id="launch-symbol" placeholder="Symbol (e.g. MINU)" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                        <input id="launch-supply" type="number" value="1000000" placeholder="Initial Supply" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                        <input id="launch-avax" type="number" value="5" placeholder="Initial AVAX for LP" class="w-full bg-deepspace border border-gray-700 rounded p-2 text-white font-mono text-xs">
+                    </div>
+                    <button id="btn-launch-token" class="btn-neon w-full py-2 rounded text-sm font-bold">LAUNCH TOKEN PROFILE</button>
+                    <button id="btn-add-lfj" class="w-full py-2 rounded text-sm font-bold border border-martianpurple text-martianpurple hover:bg-martianpurple/10">ADD LIQUIDITY PLAN (LFJ)</button>
+                    <div id="launch-output" class="hidden bg-deepspace/60 rounded-lg p-3 text-xs font-mono border border-gray-800 text-gray-300"></div>
                 </div>
 
                 <!-- HISTORY TAB -->
@@ -556,6 +572,13 @@
             // History
             txHistoryList: document.getElementById('tx-history-list'),
             clearHistory: document.getElementById('clear-history'),
+            launchName: document.getElementById('launch-name'),
+            launchSymbol: document.getElementById('launch-symbol'),
+            launchSupply: document.getElementById('launch-supply'),
+            launchAvax: document.getElementById('launch-avax'),
+            btnLaunchToken: document.getElementById('btn-launch-token'),
+            btnAddLfj: document.getElementById('btn-add-lfj'),
+            launchOutput: document.getElementById('launch-output'),
         };
 
         // --- App State ---
@@ -992,10 +1015,10 @@
             }
             const cond = UI.triggerCondition.value === 'lte' ? '≤' : '≥';
             const action = UI.actionMode.value;
-            const actionLabel = action==='wrap'?'WRAP':'action==="unwrap"?UNWRAP:ALERT';
+            const actionLabel = action === 'wrap' ? 'WRAP' : action === 'unwrap' ? 'UNWRAP' : 'ALERT';
             UI.conditionsDisplay.innerHTML = `
                 <span class="cond-badge text-green-400">● PRICE ${cond} $${state.targetPrice.toFixed(2)}</span>
-                <span class="cond-badge text-neonorange">⚡ ${action.toUpperCase()}</span>
+                <span class="cond-badge text-neonorange">⚡ ${actionLabel}</span>
                 <span class="cond-badge text-blue-400">📊 ${UI.inputBudget.value} AVAX</span>
             `;
         }
@@ -1129,6 +1152,33 @@
             }, 1000);
         }
 
+
+        function launchTokenProfile() {
+            const name = UI.launchName.value.trim();
+            const symbol = UI.launchSymbol.value.trim().toUpperCase();
+            const supply = parseFloat(UI.launchSupply.value || '0');
+            if (!name || !symbol || supply <= 0) {
+                logMsg('Launcher: missing token fields.', 'error');
+                return;
+            }
+            const pseudoAddress = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b=>b.toString(16).padStart(2,'0')).join('');
+            UI.launchOutput.classList.remove('hidden');
+            UI.launchOutput.innerHTML = `Token <span class="text-neonorange">${name} (${symbol})</span><br>Supply: ${supply.toLocaleString()}<br>Mock Address: ${pseudoAddress}<br>Status: Ready for Fuji testing`;
+            logMsg(`Token launcher: prepared ${symbol} on Fuji profile (mock).`, 'success');
+        }
+
+        function buildLfjLiquidityPlan() {
+            const symbol = (UI.launchSymbol.value || 'TOKEN').toUpperCase();
+            const avax = parseFloat(UI.launchAvax.value || '0');
+            if (avax <= 0) {
+                logMsg('LFJ plan: set AVAX amount > 0.', 'error');
+                return;
+            }
+            UI.launchOutput.classList.remove('hidden');
+            UI.launchOutput.innerHTML = `LFJ Liquidity Plan<br>1) Open <span class="text-martianpurple">https://lfj.gg</span> on Fuji network<br>2) Create ${symbol}/AVAX pair<br>3) Seed with ${avax} AVAX + matching ${symbol}<br>4) Confirm pool + save LP tx hash`;
+            logMsg(`LFJ plan generated for ${symbol}/AVAX with ${avax} AVAX.`, 'info');
+        }
+
         // --- Event Listeners ---
         UI.btnConnect.addEventListener('click', openModal);
         UI.closeModal.addEventListener('click', closeModal);
@@ -1143,6 +1193,8 @@
         UI.btnDryRun.addEventListener('click', executeDryRun);
         UI.btnStart.addEventListener('click', toggleAgent);
         UI.btnDestruct.addEventListener('click', selfDestruct);
+        UI.btnLaunchToken.addEventListener('click', launchTokenProfile);
+        UI.btnAddLfj.addEventListener('click', buildLfjLiquidityPlan);
         UI.toggleHyper.addEventListener('change', (e) => {
             state.isHyperDrive = e.target.checked;
             if (state.agentStatus !== 'idle') { stopAgent(); startAgent(); }
